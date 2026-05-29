@@ -16,7 +16,7 @@ async function runTest() {
     email: `charlie_${Date.now()}@provenstack.dev`,
     password: "Password@123",
     skills: ["React", "HTML", "CSS", "UI/UX"],
-    tier: "Intermediate",
+    tier: "Builder",
     reputationScore: 90
   });
 
@@ -25,7 +25,7 @@ async function runTest() {
     email: `dev_${Date.now()}@provenstack.dev`,
     password: "Password@123",
     skills: ["Node.js", "Express", "REST APIs"],
-    tier: "Expert",
+    tier: "Elite",
     reputationScore: 95
   });
 

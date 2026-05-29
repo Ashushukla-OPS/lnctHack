@@ -54,10 +54,27 @@ const MeetRoom = () => {
       try {
         const res = await axios.get(`/meet/room/${roomId}`);
         const info = res.data?.data || res.data;
+        
+        if (!info) {
+          throw new Error("Invalid meeting room data received");
+        }
+
+        const tId = info.teamId?._id || info.teamId || info.team?._id || info.team;
+
         if (info.status === 'ended') {
           toast.error('This meet has ended');
-          return navigate(`/teams/${info.team?._id || info.team}`);
+          return navigate(tId ? `/teams/${tId}` : '/teams');
         }
+
+        if (tId) {
+          try {
+            const teamRes = await axios.get(`/teams/${tId}`);
+            info.team = teamRes.data?.team || teamRes.data?.data || teamRes.data;
+          } catch (teamErr) {
+            console.error("Failed to fetch team details for meet", teamErr);
+          }
+        }
+
         setMeetInfo(info);
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -274,27 +291,37 @@ const MeetRoom = () => {
   const activeParticipantsCount = participants.length > 0 ? participants.length : 1; // including self
 
   return (
-    <div className="h-screen w-full bg-[#0a0a0a] flex flex-col font-sans">
+    <div className="h-screen w-full bg-[#0c0c0e] flex flex-col font-sans relative overflow-hidden select-none">
       
+      {/* Ambient glowing backdrops */}
+      <div className="absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-rose-600/5 rounded-full blur-[100px] pointer-events-none" />
+
       {/* Top Bar */}
-      <div className="h-16 bg-card border-b border-border flex items-center justify-between px-6 shrink-0">
+      <div className="h-16 bg-[#141417]/85 border-b border-[#232329] backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-10 relative">
         <div className="flex items-center gap-4">
-          <div className="font-bold text-lg text-primary tracking-tight">ProvenStack Meet</div>
-          <div className="h-4 w-[1px] bg-border mx-2"></div>
-          <div className="text-text-primary font-medium truncate max-w-[200px] sm:max-w-md">{meetInfo.title || 'Team Meeting'}</div>
+          <div className="font-display font-extrabold text-sm text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400 tracking-tight flex items-center gap-1.5">
+            <span className="text-lg">⚡</span> lnctHack Meet
+          </div>
+          <div className="h-4 w-[1px] bg-[#232329]"></div>
+          <div className="text-white font-bold text-sm truncate max-w-[200px] sm:max-w-md">{meetInfo.title || 'Team Meeting'}</div>
         </div>
         
-        <div className="flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2 text-text-muted text-sm font-mono bg-input px-3 py-1.5 rounded-lg border border-border">
-            <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
+        <div className="flex items-center gap-4">
+          {/* Live countdown timer badge */}
+          <div className="flex items-center gap-2 text-rose-400 text-xs font-bold font-mono bg-rose-500/10 px-3 py-1.5 rounded-full border border-rose-500/20 shadow-sm shadow-rose-500/5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
             {timer}
           </div>
-          <div className="flex items-center gap-2 text-text-muted text-sm">
-            <UsersIcon className="w-5 h-5" />
-            <span className="font-medium">{activeParticipantsCount}</span>
+          <div className="flex items-center gap-1.5 text-text-muted text-xs font-bold bg-[#1c1c21] border border-[#232329] px-3 py-1.5 rounded-full">
+            <UsersIcon className="w-4 h-4 text-violet-400" />
+            <span className="text-white font-extrabold">{activeParticipantsCount}</span>
           </div>
           {isLeader && (
-            <button onClick={handleEndMeet} className="border border-danger text-danger hover:bg-danger hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
+            <button 
+              onClick={handleEndMeet} 
+              className="bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all border border-rose-500/20 shadow-md shadow-rose-500/5"
+            >
               End Meet
             </button>
           )}
@@ -302,13 +329,13 @@ const MeetRoom = () => {
       </div>
 
       {/* Main Video Area */}
-      <div className="flex-1 p-4 sm:p-6 flex flex-col lg:flex-row gap-4 overflow-hidden relative">
+      <div className="flex-1 p-4 sm:p-6 flex flex-col lg:flex-row gap-5 overflow-hidden relative z-10">
         
-        {/* Main Video (Local or Active Speaker - Here just Local for simplicity unless clicked) */}
-        <div className="flex-1 bg-main border border-border rounded-2xl overflow-hidden relative flex items-center justify-center group shadow-lg">
+        {/* Main Video (Local or Active Speaker) */}
+        <div className="flex-1 bg-[#121215]/80 border border-[#232329] rounded-2xl overflow-hidden relative flex items-center justify-center group shadow-xl">
            {isVideoOff ? (
-             <div className="w-32 h-32 rounded-full bg-primary/20 text-primary border-4 border-card flex items-center justify-center text-5xl font-black">
-               {user.name?.charAt(0)}
+             <div className="w-28 h-28 rounded-full bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-violet-400 flex items-center justify-center text-4xl font-black shadow-inner select-none">
+               {user.name?.charAt(0).toUpperCase()}
              </div>
            ) : (
              <video
@@ -316,87 +343,93 @@ const MeetRoom = () => {
                autoPlay
                muted
                playsInline
-               className={`w-full h-full object-cover ${!isScreenSharing ? 'scale-x-[-1]' : ''}`}
+               className={`w-full h-full object-cover rounded-2xl ${!isScreenSharing ? 'scale-x-[-1]' : ''}`}
              />
            )}
-           <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white text-sm font-medium flex items-center gap-2">
-             You (Local)
-             {isMuted && <MicOffIcon className="w-4 h-4 text-danger" />}
+           <div className="absolute bottom-4 left-4 bg-[#101012]/80 backdrop-blur-md border border-[#232329] px-3 py-1.5 rounded-xl text-white text-xs font-bold flex items-center gap-2 shadow-lg">
+             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+             <span>You (Local)</span>
+             {isMuted && <MicOffIcon className="w-3.5 h-3.5 text-rose-500 shrink-0" />}
            </div>
         </div>
 
-        {/* Remote Grid */}
+        {/* Remote Grid Column */}
         <div className="w-full lg:w-80 xl:w-96 shrink-0 flex flex-row lg:flex-col gap-4 overflow-auto scrollbar-hide py-2 lg:py-0">
           {Object.entries(remoteStreams).map(([uId, stream]) => {
             const p = participants.find(part => part.userId === uId);
             return (
-              <div key={uId} className="w-48 lg:w-full h-32 lg:h-48 shrink-0 bg-card border border-border rounded-xl overflow-hidden relative shadow-sm flex items-center justify-center">
+              <div key={uId} className="w-52 lg:w-full h-36 lg:h-52 shrink-0 bg-[#141417]/85 border border-[#232329] rounded-2xl overflow-hidden relative shadow-lg flex items-center justify-center hover:border-violet-500/20 transition-all group">
                  {p?.isVideoOff ? (
-                   <div className="w-16 h-16 rounded-full bg-input text-text-muted border border-border flex items-center justify-center text-2xl font-bold">
-                     {p.name?.charAt(0)}
+                   <div className="w-16 h-16 rounded-full bg-[#1e1e24] border border-[#2c2c35] text-text-muted flex items-center justify-center text-2xl font-bold">
+                     {p.name?.charAt(0).toUpperCase()}
                    </div>
                  ) : (
                    <RemoteVideo stream={stream} />
                  )}
-                 <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-white text-xs font-medium flex items-center gap-1.5 max-w-[90%]">
+                 <div className="absolute bottom-3 left-3 bg-[#101012]/80 backdrop-blur-md border border-[#232329] px-2.5 py-1.5 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 max-w-[90%] shadow-md">
                    <span className="truncate">{p?.name || 'Participant'}</span>
-                   {p?.isMuted && <MicOffIcon className="w-3 h-3 text-danger shrink-0" />}
+                   {p?.isMuted && <MicOffIcon className="w-3.5 h-3.5 text-rose-500 shrink-0" />}
                  </div>
               </div>
             );
           })}
           {Object.keys(remoteStreams).length === 0 && (
-             <div className="w-full h-full min-h-[120px] bg-card border border-dashed border-border rounded-xl flex flex-col items-center justify-center text-text-muted p-4 text-center">
-               <UsersIcon className="w-8 h-8 mb-2 opacity-50" />
-               <p className="text-sm">Waiting for others to join...</p>
+             <div className="w-full lg:h-full min-h-[140px] bg-[#141417]/40 border border-dashed border-[#232329] rounded-2xl flex flex-col items-center justify-center text-text-muted p-6 text-center shadow-inner">
+               <span className="text-3xl block mb-2 animate-bounce">👥</span>
+               <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-1">Squad Lounge</h4>
+               <p className="text-[11px] text-text-muted font-medium max-w-[80%]">Waiting for team builders to connect streams...</p>
              </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Controls */}
-      <div className="h-20 bg-card border-t border-border flex items-center justify-center gap-4 shrink-0 px-4">
+      {/* Bottom Controls Floating Dock */}
+      <div className="h-20 bg-[#141417]/90 border-t border-[#232329] backdrop-blur-md flex items-center justify-center gap-4 shrink-0 px-6 z-10 relative">
          <button 
            onClick={toggleMic}
-           className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-             isMuted ? 'bg-danger text-white' : 'bg-input text-text-primary hover:bg-input/80 border border-border'
+           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+             isMuted 
+               ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 shadow-md shadow-rose-500/5' 
+               : 'bg-[#1e1e24] hover:bg-[#25252d] text-white border border-[#2c2c35] hover:border-violet-500/30'
            }`}
-           title={isMuted ? "Unmute" : "Mute"}
+           title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
          >
-           {isMuted ? <NoSymbolIcon className="w-6 h-6 absolute opacity-50" /> : null}
-           {isMuted ? <MicOffIcon className="w-5 h-5 z-10" /> : <MicrophoneIcon className="w-5 h-5" />}
+           {isMuted ? <MicOffIcon className="w-5 h-5" /> : <MicrophoneIcon className="w-5 h-5 text-violet-400" />}
          </button>
          
          <button 
            onClick={toggleCamera}
-           className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-             isVideoOff ? 'bg-danger text-white' : 'bg-input text-text-primary hover:bg-input/80 border border-border'
+           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+             isVideoOff 
+               ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 shadow-md shadow-rose-500/5' 
+               : 'bg-[#1e1e24] hover:bg-[#25252d] text-white border border-[#2c2c35] hover:border-violet-500/30'
            }`}
-           title={isVideoOff ? "Turn on camera" : "Turn off camera"}
+           title={isVideoOff ? "Turn Camera On" : "Turn Camera Off"}
          >
-           {isVideoOff ? <NoSymbolIcon className="w-6 h-6 absolute opacity-50" /> : null}
-           {isVideoOff ? <VideoCameraSlashIcon className="w-5 h-5 z-10" /> : <VideoCameraIcon className="w-5 h-5" />}
+           {isVideoOff ? <VideoCameraSlashIcon className="w-5 h-5" /> : <VideoCameraIcon className="w-5 h-5 text-violet-400" />}
          </button>
 
          <button 
            onClick={toggleScreenShare}
-           className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-             isScreenSharing ? 'bg-success text-white' : 'bg-input text-text-primary hover:bg-input/80 border border-border'
+           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+             isScreenSharing 
+               ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 shadow-md shadow-emerald-500/5' 
+               : 'bg-[#1e1e24] hover:bg-[#25252d] text-white border border-[#2c2c35] hover:border-violet-500/30'
            }`}
-           title="Share Screen"
+           title={isScreenSharing ? "Stop Sharing Screen" : "Share Screen"}
          >
-           <ComputerDesktopIcon className="w-5 h-5" />
+           <ComputerDesktopIcon className={`w-5 h-5 ${isScreenSharing ? 'text-emerald-400 animate-pulse' : 'text-violet-400'}`} />
          </button>
 
-         <div className="w-px h-8 bg-border mx-2"></div>
+         <div className="w-px h-6 bg-[#232329] mx-2"></div>
 
          <button 
            onClick={handleLeave}
-           className="h-10 px-6 rounded-full flex items-center justify-center transition-colors bg-danger text-white hover:bg-danger/90 font-medium text-sm shadow-lg shadow-danger/20"
-           title="Leave Meet"
+           className="h-10 px-6 rounded-xl flex items-center justify-center transition-all duration-300 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 active:scale-[0.98]"
+           title="Leave Meeting"
          >
-           <PhoneXMarkIcon className="w-5 h-5 mr-2" />
-           Leave
+           <PhoneXMarkIcon className="w-4 h-4 mr-2" />
+           Leave Meet
          </button>
       </div>
 

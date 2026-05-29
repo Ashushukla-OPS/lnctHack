@@ -45,7 +45,8 @@ const HackathonList = () => {
     try {
       setLoading(true);
       const res = await axios.get('/hackathon');
-      setHackathons(res.data?.data || res.data || []);
+      const hackathonList = res.data?.hackathons || res.data?.data || [];
+      setHackathons(Array.isArray(hackathonList) ? hackathonList : []);
     } catch (error) {
       toast.error('Failed to load hackathons');
     } finally {

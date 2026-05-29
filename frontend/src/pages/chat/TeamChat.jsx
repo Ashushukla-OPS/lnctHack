@@ -6,8 +6,9 @@ import axios from "../../utils/axios";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import toast from "react-hot-toast";
 
-const TeamChat = () => {
-  const { teamId } = useParams();
+const TeamChat = ({ isEmbed = false, teamId: propTeamId }) => {
+  const { teamId: paramTeamId } = useParams();
+  const teamId = propTeamId || paramTeamId;
   const { user } = useAuth();
   const navigate = useNavigate();
   const socket = useSocket();
@@ -23,11 +24,11 @@ const TeamChat = () => {
       try {
         setLoading(true);
         const [teamRes, msgRes] = await Promise.all([
-          axios.get(`/api/teams/${teamId}`),
-          axios.get(`/api/teams/${teamId}/messages`),
+          axios.get(`/teams/${teamId}`),
+          axios.get(`/message/${teamId}`),
         ]);
-        setTeam(teamRes.data);
-        setMessages(msgRes.data);
+        setTeam(teamRes.data?.team || teamRes.data?.data || teamRes.data);
+        setMessages(msgRes.data?.data || msgRes.data?.messages || msgRes.data || []);
       } catch (err) {
         toast.error("Failed to load lounge data");
         navigate("/dashboard");
@@ -68,35 +69,44 @@ const TeamChat = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const res = await axios.post(`/api/teams/${teamId}/messages`, {
+      const res = await axios.post(`/message/send/${teamId}`, {
         content: newMessage,
       });
       // Emitted message is handled via socket listener as well
-      socket.emit("send_message", { ...res.data, teamId });
+      const sentMsg = res.data?.data || res.data;
+      socket.emit("send_message", { ...sentMsg, teamId });
       setNewMessage("");
     } catch (err) {
       toast.error("Failed to send message");
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return (
+      <div className={`flex justify-center items-center ${isEmbed ? "h-[400px]" : "h-screen"}`}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-6xl mx-auto px-4 py-6">
-      <div className="flex-1 rounded-xl border border-border bg-card flex flex-col overflow-hidden">
+    <div className={isEmbed ? "flex flex-col h-full w-full overflow-hidden" : "flex flex-col h-[calc(100vh-4rem)] max-w-6xl mx-auto px-4 py-6"}>
+      <div className={`flex-1 flex flex-col overflow-hidden ${isEmbed ? "" : "rounded-xl border border-border bg-card shadow-sm"}`}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-border bg-[#141414] flex justify-between items-center">
+        <div className="px-6 py-4 border-b border-border bg-[#141414] flex justify-between items-center shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-text-primary">💬 {team?.name} Lounge</h2>
+            <h2 className="text-lg font-bold text-text-primary">💬 {team?.teamName || team?.name} Lounge</h2>
             <p className="text-xs text-text-muted">Chat with your hackathon squad members in real-time</p>
           </div>
-          <button
-            onClick={() => navigate(`/meet/${teamId}`)}
-            className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-opacity-90 text-white rounded-lg text-xs font-semibold transition-all shadow-md shadow-primary/20"
-          >
-            <span>📹</span>
-            <span>Start Video Meet</span>
-          </button>
+          {!isEmbed && (
+            <button
+              onClick={() => navigate(`/meet/${teamId}`)}
+              className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-opacity-90 text-white rounded-lg text-xs font-semibold transition-all shadow-md shadow-primary/20"
+            >
+              <span>📹</span>
+              <span>Start Video Meet</span>
+            </button>
+          )}
         </div>
 
         {/* Messages */}
@@ -130,7 +140,7 @@ const TeamChat = () => {
         </div>
 
         {/* Input area */}
-        <form onSubmit={handleSend} className="p-4 border-t border-border bg-[#141414] flex gap-3">
+        <form onSubmit={handleSend} className="p-4 border-t border-border bg-[#141414] flex gap-3 shrink-0">
           <input
             type="text"
             value={newMessage}

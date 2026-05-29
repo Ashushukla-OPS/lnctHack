@@ -127,9 +127,9 @@ const SkillGap = () => {
           <h2 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
             <InformationCircleIcon className="w-5 h-5 text-primary" /> Slots Require
           </h2>
-          {team.openSlots?.filter(s => !s.isFilled).length > 0 ? (
+          {team.openSlots?.filter(s => !(s.filled || s.isFilled)).length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {team.openSlots.filter(s => !s.isFilled).map((slot) => (
+              {team.openSlots.filter(s => !(s.filled || s.isFilled)).map((slot) => (
                 slot.requiredSkills?.map((skill, i) => (
                   <span key={`${slot._id}-${i}`} className="bg-input border border-border text-text-primary px-3 py-1.5 rounded-lg text-sm font-medium">
                     {skill} <span className="text-text-muted text-xs ml-1 font-normal">({slot.role})</span>

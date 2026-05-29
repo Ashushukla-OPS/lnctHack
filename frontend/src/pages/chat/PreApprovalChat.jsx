@@ -9,7 +9,8 @@ import {
   PaperAirplaneIcon,
   CheckCircleIcon,
   XCircleIcon,
-  LockClosedIcon
+  LockClosedIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 
 const PreApprovalChat = () => {
@@ -138,7 +139,8 @@ const PreApprovalChat = () => {
   if (loading) return <div className="flex justify-center items-center h-screen"><LoadingSpinner /></div>;
   if (!request) return null;
 
-  const isLeader = request.team?.leader === user?._id || request.team?.leader?._id === user?._id;
+  const requestLeaderId = typeof request.team?.leader === 'object' ? request.team?.leader?._id : request.team?.leader;
+  const isLeader = requestLeaderId && user?._id && String(requestLeaderId).trim().toLowerCase() === String(user._id).trim().toLowerCase();
   const isPending = request.status === 'pending';
 
   // Group messages by date (simple implementation)
@@ -154,7 +156,7 @@ const PreApprovalChat = () => {
           </button>
           <div>
             <h1 className="font-bold text-text-primary text-lg leading-tight">
-              {request.user?.name} <span className="text-text-muted font-normal mx-1">→</span> {request.team?.name}
+              {(request.sender || request.user)?.name} <span className="text-text-muted font-normal mx-1">→</span> {request.team?.name || request.team?.teamName}
             </h1>
             <p className="text-xs text-text-muted mt-0.5">Role: {request.appliedRole}</p>
           </div>

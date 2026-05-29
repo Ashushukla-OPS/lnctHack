@@ -16,7 +16,7 @@ async function runTest() {
     email: `alice_${Date.now()}@provenstack.dev`,
     password: "Password@123",
     skills: ["React", "CSS", "UI/UX", "JavaScript"],
-    tier: "Expert",
+    tier: "Elite",
     scores: { leetcode: 1800, cf: 1400, projects: 5 },
     reputationScore: 95
   });
@@ -26,7 +26,7 @@ async function runTest() {
     email: `bob_${Date.now()}@provenstack.dev`,
     password: "Password@123",
     skills: ["Node.js", "Express", "MongoDB", "AI", "Python"],
-    tier: "Expert",
+    tier: "Elite",
     scores: { leetcode: 2000, cf: 1600, projects: 8 },
     reputationScore: 98
   });
@@ -100,7 +100,7 @@ async function runTest() {
       email: `charlie_${Date.now()}@provenstack.dev`,
       password: "Password@123",
       skills: ["Figma", "UI/UX", "CSS"],
-      tier: "Intermediate",
+      tier: "Builder",
       scores: { leetcode: 1000, cf: 800, projects: 2 },
       reputationScore: 90
     });

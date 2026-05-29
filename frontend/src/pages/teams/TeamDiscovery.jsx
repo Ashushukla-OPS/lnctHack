@@ -7,7 +7,6 @@ import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import toast from 'react-hot-toast';
-import { MagnifyingGlassIcon, PlusIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 const TeamDiscovery = () => {
   const { user } = useAuth();
@@ -39,8 +38,8 @@ const TeamDiscovery = () => {
           axios.get('/join-request/my-requests')
         ]);
         
-        setTeams(teamsRes.data?.data || teamsRes.data || []);
-        setHackathons(hackathonsRes.data?.data || hackathonsRes.data || []);
+        setTeams(teamsRes.data?.teams || teamsRes.data?.data || teamsRes.data || []);
+        setHackathons(hackathonsRes.data?.hackathons || hackathonsRes.data?.data || hackathonsRes.data || []);
         setMyRequests(requestsRes.data?.data || requestsRes.data || []);
       } catch (error) {
         toast.error('Failed to load teams data');
@@ -91,13 +90,13 @@ const TeamDiscovery = () => {
   };
 
   const filteredTeams = teams.filter(team => {
-    const matchesSearch = team.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (team.teamName || team.name || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesHackathon = selectedHackathon ? team.hackathon?._id === selectedHackathon : true;
     const matchesLocation = locationFilter ? 
       (team.isRemote ? 'remote' : team.location?.toLowerCase() || '').includes(locationFilter.toLowerCase()) 
       : true;
     
-    const matchesRole = selectedRole ? team.openSlots?.some(slot => slot.role?.toLowerCase().includes(selectedRole.toLowerCase())) : true;
+    const matchesRole = selectedRole ? team.openSlots?.some(slot => !(slot.filled || slot.isFilled) && slot.role?.toLowerCase().includes(selectedRole.toLowerCase())) : true;
 
     return matchesSearch && matchesHackathon && matchesLocation && matchesRole;
   });
@@ -114,79 +113,105 @@ const TeamDiscovery = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in font-sans relative overflow-hidden">
+      
+      {/* Visual neon backdrops */}
+      <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none" />
+
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#232329] pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">Find Your Team</h1>
-          <p className="text-text-muted mt-2">Discover verified teams looking for talent</p>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+            Find Your Hackathon Team
+          </h1>
+          <p className="text-sm text-text-muted mt-1 font-medium">
+            Discover active builder squads seeking specific engineering specialties and roles.
+          </p>
         </div>
         <Link 
           to="/teams/create" 
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          className="btn-primary text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-violet-500/10 flex items-center justify-center gap-1.5 shrink-0"
         >
-          <PlusIcon className="w-5 h-5" />
-          Create Team
+          <span>➕</span>
+          <span>Create Team</span>
         </Link>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-card border border-border rounded-xl p-4 mb-8 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="glass-card bg-[#141417]/85 border border-[#232329] p-5 backdrop-blur-md shadow-lg rounded-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          
+          {/* Search Input */}
           <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm select-none">
+              🔍
+            </span>
             <input
               type="text"
-              placeholder="Search teams..."
+              placeholder="Search by team name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-text-muted/40 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all"
             />
           </div>
           
-          <div className="relative">
+          {/* Hackathon Filter */}
+          <div className="relative flex items-center">
             <select
               value={selectedHackathon}
               onChange={(e) => setSelectedHackathon(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
             >
               <option value="">All Hackathons</option>
               {hackathons.map(h => (
                 <option key={h._id} value={h._id}>{h.name}</option>
               ))}
             </select>
+            <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
 
-          <div className="relative">
+          {/* Specialty Role Filter */}
+          <div className="relative flex items-center">
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
             >
-              <option value="">All Roles</option>
-              <option value="frontend">Frontend</option>
-              <option value="backend">Backend</option>
-              <option value="fullstack">Full Stack</option>
-              <option value="design">Design</option>
-              <option value="ai">AI/ML</option>
+              <option value="">All Specialties</option>
+              <option value="frontend">Frontend Experts</option>
+              <option value="backend">Backend Architects</option>
+              <option value="fullstack">Full Stack Engineers</option>
+              <option value="design">UI/UX Designers</option>
+              <option value="ai">AI / ML Coders</option>
             </select>
+            <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
 
+          {/* Location Filter */}
           <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-sm select-none">
+              📍
+            </span>
             <input
               type="text"
               placeholder="Location or 'Remote'"
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-text-muted/40 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all"
             />
           </div>
+
         </div>
       </div>
 
       {/* Teams Grid */}
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex justify-center items-center h-64 bg-[#0c0c0e]">
           <LoadingSpinner />
         </div>
       ) : filteredTeams.length > 0 ? (
@@ -202,65 +227,70 @@ const TeamDiscovery = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl p-8">
+        <div className="glass-card bg-[#141417]/85 border border-[#232329] p-12 text-center rounded-2xl shadow-sm">
           <EmptyState 
-            icon={<UserGroupIcon className="w-12 h-12 text-text-muted" />}
-            title="No teams match your search"
-            description="Try adjusting your filters to find more teams."
-            action={{ label: 'Clear Filters', onClick: clearFilters }}
+            icon={<span className="text-4xl block mb-2 select-none">👥</span>}
+            title="No squads match your filters"
+            description="Try broadening your search terms or clearing role filters."
+            action={{ label: 'Clear All Filters', onClick: clearFilters }}
           />
         </div>
       )}
 
-      {/* Interest Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Express Interest">
+      {/* Interest Submission Modal */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Express Collaboration Interest">
         {selectedTeam && (
-          <div className="space-y-4">
+          <div className="space-y-5 font-sans">
             <div>
-              <p className="text-sm text-text-muted mb-1">Applying to Team</p>
-              <p className="font-semibold text-text-primary">{selectedTeam.name}</p>
+              <p className="text-xs text-text-muted font-bold uppercase tracking-wider mb-1">Selected Squad</p>
+              <p className="font-bold text-lg text-white tracking-tight">{selectedTeam.teamName || selectedTeam.name}</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">Select Role</label>
-              <select
-                value={applyRole}
-                onChange={(e) => setApplyRole(e.target.value)}
-                className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors"
-              >
-                {selectedTeam.openSlots?.map((slot, idx) => (
-                  <option key={idx} value={slot.role}>{slot.role}</option>
-                ))}
-              </select>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-text-muted uppercase tracking-wider">Choose Desired Role</label>
+              <div className="relative flex items-center">
+                <select
+                  value={applyRole}
+                  onChange={(e) => setApplyRole(e.target.value)}
+                  className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500 transition-all font-medium appearance-none cursor-pointer"
+                >
+                  {selectedTeam.openSlots?.filter(slot => !(slot.filled || slot.isFilled)).map((slot, idx) => (
+                    <option key={idx} value={slot.role}>{slot.role}</option>
+                  ))}
+                </select>
+                <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-1">Message (Optional)</label>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-text-muted uppercase tracking-wider">Cover Note / Message (Optional)</label>
               <textarea
                 value={applyMessage}
                 onChange={(e) => setApplyMessage(e.target.value)}
                 maxLength={300}
                 rows={4}
-                placeholder="Why are you a good fit?"
-                className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors resize-none"
+                placeholder="Briefly state your competencies and why you are a good fit for this squad..."
+                className="w-full bg-[#16161a] border border-[#232329] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500 transition-all font-medium resize-none"
               ></textarea>
-              <p className="text-xs text-text-muted text-right mt-1">{applyMessage.length}/300</p>
+              <p className="text-[10px] text-text-muted text-right mt-1 font-bold">{applyMessage.length}/300 chars</p>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-border">
+            <div className="pt-4 flex justify-end gap-3 border-t border-[#232329]">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-lg text-text-muted hover:bg-input transition-colors font-medium"
+                className="btn-secondary px-5 py-2 text-xs rounded-xl font-bold"
               >
                 Cancel
               </button>
               <button
                 onClick={submitInterest}
                 disabled={submittingInterest}
-                className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                className="btn-primary px-5 py-2 text-xs rounded-xl font-bold shadow-md shadow-violet-500/10"
               >
-                {submittingInterest ? 'Sending...' : 'Submit Interest'}
+                {submittingInterest ? 'Submitting...' : 'Submit Interest 🚀'}
               </button>
             </div>
           </div>
