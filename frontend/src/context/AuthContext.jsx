@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await axiosInstance.get("/users/me");
-      const userData = response.data?.data || response.data;
+      const userData = response.data?.user || response.data?.data || response.data;
       setUser(userData);
       setIsLoggedIn(true);
       return userData;
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       
       // Access token might be inside response.data.token or response.data.data.token
       // (Backend registers accessToken in cookies, but also returns user info)
-      const userData = response.data?.data || response.data;
+      const userData = response.data?.user || response.data?.data || response.data;
       const responseToken = response.data?.token || response.data?.data?.token || "dummy-token-cookie-managed";
 
       localStorage.setItem("token", responseToken);
