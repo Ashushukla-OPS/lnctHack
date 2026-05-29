@@ -7,7 +7,7 @@ const TeamCard = ({ team, isApplied, isMember, onInterest }) => {
     <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:border-primary/50 transition-colors flex flex-col h-full">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-bold text-text-primary">{team.name}</h3>
+          <h3 className="text-lg font-bold text-text-primary">{team.teamName || team.name}</h3>
           {team.hackathon && (
             <p className="text-sm text-text-muted mt-1">{team.hackathon.name}</p>
           )}

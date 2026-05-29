@@ -39,8 +39,8 @@ const TeamDiscovery = () => {
           axios.get('/join-request/my-requests')
         ]);
         
-        setTeams(teamsRes.data?.data || teamsRes.data || []);
-        setHackathons(hackathonsRes.data?.data || hackathonsRes.data || []);
+        setTeams(teamsRes.data?.teams || teamsRes.data?.data || teamsRes.data || []);
+        setHackathons(hackathonsRes.data?.hackathons || hackathonsRes.data?.data || hackathonsRes.data || []);
         setMyRequests(requestsRes.data?.data || requestsRes.data || []);
       } catch (error) {
         toast.error('Failed to load teams data');
@@ -91,7 +91,7 @@ const TeamDiscovery = () => {
   };
 
   const filteredTeams = teams.filter(team => {
-    const matchesSearch = team.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (team.teamName || team.name || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesHackathon = selectedHackathon ? team.hackathon?._id === selectedHackathon : true;
     const matchesLocation = locationFilter ? 
       (team.isRemote ? 'remote' : team.location?.toLowerCase() || '').includes(locationFilter.toLowerCase()) 
@@ -218,7 +218,7 @@ const TeamDiscovery = () => {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-text-muted mb-1">Applying to Team</p>
-              <p className="font-semibold text-text-primary">{selectedTeam.name}</p>
+              <p className="font-semibold text-text-primary">{selectedTeam.teamName || selectedTeam.name}</p>
             </div>
 
             <div>
