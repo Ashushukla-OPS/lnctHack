@@ -49,6 +49,11 @@ const teamSchema = new mongoose.Schema(
           type: Boolean,
           default: false,
         },
+
+        lastReadAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
 
@@ -59,28 +64,28 @@ const teamSchema = new mongoose.Schema(
           required: true,
           trim: true,
         },
-
-        skillType: {
-          type: String,
-          enum: [
-            "frontend",
-            "backend",
-            "fullstack",
-            "dsa",
-            "ai",
-            "design",
-          ],
-          required: true,
-        },
-
         minScore: {
           type: Number,
           default: 0,
         },
-
+        requiredSkills: [
+          {
+            type: String,
+            trim: true,
+          },
+        ],
         filled: {
           type: Boolean,
           default: false,
+        },
+        filledBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          default: null,
+        },
+        pendingRequestsCount: {
+          type: Number,
+          default: 0,
         },
       },
     ],
@@ -92,12 +97,32 @@ const teamSchema = new mongoose.Schema(
 
     chemistryScore: {
       type: Number,
-      default: 0,
+      default: null,
     },
 
     chemistryNote: {
       type: String,
       default: "",
+    },
+
+    chemistryUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+
+    chemistryData: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    skillGapUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+
+    skillGapData: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
 
     contextDoc: {
@@ -136,6 +161,22 @@ const teamSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+teamSchema.pre("save", function (next) {
+  if (this.isModified("members")) {
+    this.chemistryScore = null;
+    this.chemistryNote = "";
+    this.chemistryUpdatedAt = null;
+    this.chemistryData = null;
+    this.skillGapUpdatedAt = null;
+    this.skillGapData = null;
+  }
+  if (this.isModified("openSlots")) {
+    this.skillGapUpdatedAt = null;
+    this.skillGapData = null;
+  }
+  next();
+});
 
 const TeamModel = mongoose.model("Team", teamSchema);
 

@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    
+    refreshToken: {
+      type: String,
+      default: "",
+    },
+
     bio: {
       type: String,
       default: "",
@@ -214,6 +218,33 @@ const userSchema = new mongoose.Schema(
     lastScanAt: {
       type: Date,
       default: null,
+    },
+
+    reputationScore: {
+      type: Number,
+      default: 100,
+      min: 0,
+      max: 200,
+    },
+
+    totalTeamsJoined: {
+      type: Number,
+      default: 0,
+    },
+
+    totalDropouts: {
+      type: Number,
+      default: 0,
+    },
+
+    isBlacklisted: {
+      type: Boolean,
+      default: false,
+    },
+
+    blacklistedReason: {
+      type: String,
+      default: "",
     },
   },
   {

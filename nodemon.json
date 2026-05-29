@@ -1,0 +1,15 @@
+{
+  "watch": ["server.js", "src", "config", "routes", "controllers", "services", "models", "middleware", "utils", "socket"],
+  "ignore": ["node_modules", "frontend", "client", ".git", ".env", "*.log"],
+  "ext": "js",
+  "exec": "node",
+  "delay": 500,
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "events": {
+    "restart": "echo '\\n🔄 Restarting server...\\n'",
+    "crash": "echo '\\n❌ Script crashed. Waiting for file changes...\\n'",
+    "quit": "echo '\\n👋 Quit.\\n'"
+  }
+}

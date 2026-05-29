@@ -1,9 +1,14 @@
-const mongoose = require("mongoose")
+/**
+ * Database Connection Module - Backward Compatibility Wrapper
+ * 
+ * This module maintains backward compatibility by wrapping the new
+ * enhanced MongoDB connection handler from mongoConnection.js
+ * 
+ * Usage:
+ * const connectDB = require('./config/db');
+ * await connectDB();
+ */
 
-async function connectDB(){
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log("connected to DB....")
-}
+const { connectDB: mongoConnect } = require("./mongoConnection");
 
-
-module.exports = connectDB
+module.exports = mongoConnect;

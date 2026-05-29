@@ -7,6 +7,7 @@ const {
   getAllUsersController,
   getSingleUserController,
   exploreUsersController,
+  getUserReputationController,
 } = require("../controllers/user.controller");
 
 const router = express.Router();
@@ -22,9 +23,10 @@ router.get("/", authMiddleware, getAllUsersController);
 
 router.get("/explore", authMiddleware, exploreUsersController);
 
+// Get user reputation (Must be declared before GET /:id to avoid conflict)
+router.get("/:id/reputation", authMiddleware, getUserReputationController);
+
 // Get single user
 router.get("/:id", authMiddleware, getSingleUserController);
-
-
 
 module.exports = router;

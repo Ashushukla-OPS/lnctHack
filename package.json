@@ -1,11 +1,53 @@
 {
+  "name": "provenstack",
+  "version": "1.0.0",
+  "description": "ProvenStack - Hackathon Team Finder Platform with AI Matching",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "NODE_ENV=production node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Linting not configured yet\"",
+    "format": "echo \"Formatting not configured yet\""
+  },
+  "keywords": [
+    "hackathon",
+    "team-finder",
+    "ai-matching",
+    "express",
+    "nodejs"
+  ],
+  "author": "ProvenStack Team",
+  "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcrypt": "^6.0.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.19.0",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.6.2"
+    "mongoose": "^9.6.2",
+    "morgan": "^1.10.0",
+    "node-cron": "^4.2.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "peer": "^1.0.2",
+    "peerjs": "^1.5.5",
+    "socket.io": "^4.8.3",
+    "uuid": "^14.0.0",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }

@@ -59,10 +59,9 @@ let registerService = async (data) => {
     let refreshToken =
       generateRefreshToken(newUser._id);
 
-    // OPTIONAL:
     // if refreshToken field exists in model
-    // newUser.refreshToken = refreshToken;
-    // await newUser.save();
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
 
     // remove password
     newUser.password = undefined;
@@ -137,10 +136,9 @@ let loginService = async (data) => {
     let refreshToken =
       generateRefreshToken(isExist._id);
 
-    // OPTIONAL:
     // if refreshToken field exists
-    // isExist.refreshToken = refreshToken;
-    // await isExist.save();
+    isExist.refreshToken = refreshToken;
+    await isExist.save();
 
     // remove password
     isExist.password = undefined;
