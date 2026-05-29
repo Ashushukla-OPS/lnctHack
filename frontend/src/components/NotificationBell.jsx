@@ -78,64 +78,65 @@ const NotificationBell = () => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-50" ref={dropdownRef}>
       <button
         onClick={handleToggleOpen}
-        className="relative p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-input transition-colors focus:outline-none"
+        className="relative p-2.5 rounded-xl text-text-muted hover:text-white hover:bg-[#1a1a20] border border-transparent hover:border-[#232329] transition-all focus:outline-none"
       >
-        <BellIcon className="w-6 h-6" />
+        <BellIcon className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-danger rounded-full ring-2 ring-main"></span>
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-[#0c0c0e] animate-pulse"></span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
-          <div className="p-4 border-b border-border flex justify-between items-center bg-input/50">
-            <h3 className="font-semibold text-text-primary">Notifications</h3>
+        <div className="absolute right-0 mt-2.5 w-80 glass-card bg-[#141417]/95 border border-[#232329] rounded-2xl shadow-xl z-50 overflow-hidden animate-fade-in font-sans">
+          <div className="p-4 border-b border-[#232329] flex justify-between items-center bg-[#1c1c21]/80 backdrop-blur-sm">
+            <h3 className="font-bold text-white text-xs uppercase tracking-wider">Notifications</h3>
             {unreadCount > 0 && (
               <button
-                className="text-xs text-primary hover:text-primary/80 font-medium"
+                className="text-xs text-violet-400 hover:text-violet-300 font-bold transition-colors"
                 onClick={handleMarkAllRead}
               >
                 Mark all read
               </button>
             )}
           </div>
-          <div className="max-h-[300px] overflow-y-auto divide-y divide-border">
+          <div className="max-h-[300px] overflow-y-auto divide-y divide-[#232329] scrollbar-hide">
             {notifications.length > 0 ? (
               notifications.map((notif) => (
                 <div
                   key={notif._id}
                   onClick={() => handleNotificationClick(notif)}
-                  className={`p-4 hover:bg-input/30 cursor-pointer transition-colors relative ${
-                    !notif.isRead ? 'bg-primary/5' : ''
+                  className={`p-4 hover:bg-[#1a1a22]/50 cursor-pointer transition-colors relative ${
+                    !notif.isRead ? 'bg-violet-500/5' : ''
                   }`}
                 >
                   {!notif.isRead && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-violet-500"></div>
                   )}
-                  <div className="flex justify-between items-start mb-1">
-                    <p className={`text-xs font-semibold uppercase tracking-wider ${!notif.isRead ? 'text-primary' : 'text-text-muted'}`}>
+                  <div className="flex justify-between items-start mb-1 gap-2">
+                    <p className={`text-[10px] font-black uppercase tracking-wider ${!notif.isRead ? 'text-violet-400' : 'text-text-muted'}`}>
                       {notif.type?.replace(/_/g, ' ') || 'Alert'}
                     </p>
-                    <span className="text-[10px] text-text-muted whitespace-nowrap ml-2">
+                    <span className="text-[9px] text-text-muted whitespace-nowrap">
                       {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className={`text-sm text-text-primary ${!notif.isRead ? 'font-medium' : 'font-normal'}`}>
+                  <p className={`text-xs text-text-muted leading-relaxed ${!notif.isRead ? 'font-bold text-white' : 'font-medium'}`}>
                     {notif.message}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="p-8 text-center text-text-muted">
-                <p>No new notifications</p>
+              <div className="p-8 text-center text-text-muted flex flex-col items-center justify-center">
+                <span className="text-2xl block mb-1">🔔</span>
+                <p className="text-xs font-semibold">All caught up!</p>
               </div>
             )}
           </div>
-          <div className="p-3 border-t border-border text-center bg-input/20">
-            <Link to="/notifications" onClick={() => setIsOpen(false)} className="text-xs text-primary font-medium hover:underline">
+          <div className="p-3 border-t border-[#232329] text-center bg-[#18181c]/40">
+            <Link to="/notifications" onClick={() => setIsOpen(false)} className="text-xs text-violet-400 font-bold hover:text-violet-300 hover:underline">
               View all notifications
             </Link>
           </div>

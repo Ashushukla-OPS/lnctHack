@@ -98,14 +98,14 @@ const NotificationsPage = () => {
 
   const getIconForType = (type) => {
     switch (type) {
-      case 'join_interest': return <UserPlusIcon className="w-5 h-5 text-primary" />;
-      case 'request_accepted': return <CheckCircleIcon className="w-5 h-5 text-success" />;
-      case 'request_rejected': return <XCircleIcon className="w-5 h-5 text-danger" />;
-      case 'new_message': return <ChatBubbleOvalLeftIcon className="w-5 h-5 text-primary" />;
-      case 'team_update': return <UsersIcon className="w-5 h-5 text-accent" />;
-      case 'member_left': return <ArrowLeftOnRectangleIcon className="w-5 h-5 text-warning" />;
-      case 'hackathon_reminder': return <BellIcon className="w-5 h-5 text-warning" />;
-      case 'slot_filled': return <StarIcon className="w-5 h-5 text-success" />;
+      case 'join_interest': return <UserPlusIcon className="w-5 h-5 text-violet-400" />;
+      case 'request_accepted': return <CheckCircleIcon className="w-5 h-5 text-emerald-400" />;
+      case 'request_rejected': return <XCircleIcon className="w-5 h-5 text-rose-400" />;
+      case 'new_message': return <ChatBubbleOvalLeftIcon className="w-5 h-5 text-violet-400" />;
+      case 'team_update': return <UsersIcon className="w-5 h-5 text-sky-400" />;
+      case 'member_left': return <ArrowLeftOnRectangleIcon className="w-5 h-5 text-amber-400" />;
+      case 'hackathon_reminder': return <BellIcon className="w-5 h-5 text-amber-400" />;
+      case 'slot_filled': return <StarIcon className="w-5 h-5 text-emerald-400" />;
       default: return <BellIcon className="w-5 h-5 text-text-muted" />;
     }
   };
@@ -125,34 +125,42 @@ const NotificationsPage = () => {
   if (loading) return <div className="flex justify-center items-center h-screen"><LoadingSpinner /></div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)]">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)] space-y-8 animate-fade-in font-sans relative overflow-hidden">
+      
+      {/* Ambient background flares */}
+      <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#232329] pb-6 relative z-10">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-text-primary">Notifications</h1>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight">Notifications</h1>
           {unreadCount > 0 && (
-            <span className="bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">{unreadCount}</span>
+            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full shadow-violet-500/10 tracking-wider">
+              {unreadCount} UNREAD
+            </span>
           )}
         </div>
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="text-sm font-medium text-primary border border-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-colors"
+            className="text-xs font-bold text-white bg-[#1e1e24] hover:bg-[#25252d] border border-[#2c2c35] hover:border-violet-500/30 px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
           >
-            Mark all read
+            <span>✔</span> Mark all read
           </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-border mb-6 flex overflow-x-auto scrollbar-hide">
+      <div className="border-b border-[#232329] mb-6 flex overflow-x-auto scrollbar-hide relative z-10">
         {['All', 'Unread', 'Team', 'Requests', 'Hackathons'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`py-3 px-6 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+            className={`py-3 px-6 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${
               activeTab === tab
-                ? 'border-primary text-primary'
-                : 'border-transparent text-text-muted hover:text-text-primary hover:border-border'
+                ? 'border-violet-500 text-violet-400'
+                : 'border-transparent text-text-muted hover:text-text-primary hover:border-[#232329]'
             }`}
           >
             {tab}
@@ -161,39 +169,41 @@ const NotificationsPage = () => {
       </div>
 
       {/* List */}
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden min-h-[400px]">
+      <div className="glass-card bg-[#141417]/85 border border-[#232329] rounded-2xl shadow-xl overflow-hidden min-h-[400px] relative z-10">
         {filtered.length > 0 ? (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-[#232329]">
             {filtered.map(notif => (
               <div 
                 key={notif._id} 
                 onClick={() => handleNotificationClick(notif)}
-                className={`p-4 flex gap-4 cursor-pointer hover:bg-input/50 transition-colors group relative ${
-                  !notif.isRead ? 'bg-primary/5' : ''
+                className={`p-5 flex gap-4 cursor-pointer hover:bg-[#1a1a22]/50 transition-colors group relative items-start ${
+                  !notif.isRead ? 'bg-violet-500/5' : ''
                 }`}
               >
                 {!notif.isRead && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r"></div>
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-violet-500"></div>
                 )}
                 
-                <div className="mt-1 flex-shrink-0 bg-input p-2 rounded-full border border-border">
+                <div className="flex-shrink-0 bg-[#1a1a20] border border-[#2c2c35] p-2.5 rounded-xl group-hover:border-violet-500/20 transition-all shadow-sm">
                   {getIconForType(notif.type)}
                 </div>
                 
                 <div className="flex-1 min-w-0 pr-8">
-                  <p className={`text-sm text-text-primary ${!notif.isRead ? 'font-semibold' : 'font-normal'}`}>
-                    {notif.message}
+                  <p className={`text-xs text-text-muted font-bold uppercase tracking-wider mb-1 flex items-center gap-2`}>
+                    <span>{notif.type?.replace(/_/g, ' ')}</span>
+                    <span className="text-[10px] text-[#2c2c35] font-black">•</span>
+                    <span className="text-[10px] font-normal normal-case">{formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}</span>
                   </p>
-                  <p className="text-xs text-text-muted mt-1">
-                    {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                  <p className={`text-sm text-text-muted leading-relaxed ${!notif.isRead ? 'font-bold text-white' : 'font-medium'}`}>
+                    {notif.message}
                   </p>
                 </div>
 
                 <button 
                   onClick={(e) => handleDelete(e, notif._id)}
-                  className="opacity-0 group-hover:opacity-100 p-2 text-text-muted hover:text-danger hover:bg-danger/10 rounded-lg transition-all absolute right-4 top-1/2 -translate-y-1/2"
+                  className="opacity-0 group-hover:opacity-100 p-2 text-text-muted hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 rounded-xl transition-all absolute right-4 top-1/2 -translate-y-1/2"
                 >
-                  <XMarkIcon className="w-5 h-5" />
+                  <XMarkIcon className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -201,18 +211,18 @@ const NotificationsPage = () => {
         ) : (
           <div className="h-[400px] flex items-center justify-center">
             <EmptyState 
-              icon={<BellIcon className="w-12 h-12 text-border" />}
+              icon={<span className="text-4xl block mb-2 select-none">🔔</span>}
               title={activeTab === 'All' ? "You're all caught up! 🎉" : activeTab === 'Unread' ? "No unread notifications" : "No notifications in this category"}
-              description="When you get updates, they'll show up here."
+              description="When new team updates or join requests arrive, they'll instantly appear here."
             />
           </div>
         )}
       </div>
       
       {filtered.length > 0 && (
-        <div className="mt-6 text-center">
-          <button className="text-sm font-medium text-text-muted hover:text-primary transition-colors py-2 px-4 rounded-lg hover:bg-input">
-            Load more
+        <div className="mt-6 text-center relative z-10">
+          <button className="text-xs font-bold text-violet-400 hover:text-violet-300 transition-all py-2.5 px-5 rounded-xl bg-[#1e1e24] hover:bg-[#25252d] border border-[#2c2c35] hover:border-violet-500/20 shadow-md">
+            Load More Notifications
           </button>
         </div>
       )}
