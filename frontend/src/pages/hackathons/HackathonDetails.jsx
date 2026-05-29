@@ -185,7 +185,7 @@ const HackathonDetails = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {teams.map(team => (
               <div key={team._id} className="bg-main border border-border hover:border-primary/50 transition-colors rounded-xl p-5 flex flex-col h-full">
-                <h3 className="font-bold text-text-primary text-lg mb-4">{team.name}</h3>
+                <h3 className="font-bold text-text-primary text-lg mb-4">{team.teamName || team.name}</h3>
                 <div className="flex justify-between items-center text-sm text-text-muted mb-4 mt-auto">
                   <span className="flex items-center gap-1.5"><UserGroupIcon className="w-4 h-4"/> {team.members?.length || 0} Members</span>
                   <span className="font-medium text-warning bg-warning/10 px-2 py-0.5 rounded">{team.openSlots?.filter(s => !s.isFilled).length || 0} Open Slots</span>

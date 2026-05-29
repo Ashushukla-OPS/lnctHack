@@ -187,7 +187,7 @@ const TaskBoard = () => {
             <ArrowLeftIcon className="w-4 h-4" /> Back to Team
           </Link>
           <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
-            Task Board <span className="text-xl font-normal text-text-muted">• {team.name}</span>
+            Task Board <span className="text-xl font-normal text-text-muted">• {team.teamName || team.name}</span>
           </h1>
         </div>
         <button

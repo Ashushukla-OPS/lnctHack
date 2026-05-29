@@ -104,7 +104,7 @@ const AIMatch = () => {
           <h1 className="text-4xl font-black text-text-primary mb-2 flex items-center gap-3">
             AI Teammate Finder <SparklesIcon className="w-8 h-8 text-primary" />
           </h1>
-          <p className="text-text-muted text-lg">Powered by Gemini AI • <span className="font-semibold text-text-primary">{team.name}</span></p>
+          <p className="text-text-muted text-lg">Powered by Gemini AI • <span className="font-semibold text-text-primary">{team.teamName || team.name}</span></p>
         </div>
         
         <div className="shrink-0 flex flex-col items-end">
@@ -169,7 +169,26 @@ const AIMatch = () => {
         {!analyzing && matches.length > 0 && matches.map((match, idx) => {
           const u = match.user;
           const fitLevel = match.algorithmScore >= 80 ? 'Strong' : match.algorithmScore >= 60 ? 'Good' : 'Average';
-          const fitColor = fitLevel === 'Strong' ? 'success' : fitLevel === 'Good' ? 'primary' : 'warning';
+          
+          const fitColorMap = {
+            Strong: {
+              bg: 'bg-success/20',
+              text: 'text-success',
+              border: 'border-success/30'
+            },
+            Good: {
+              bg: 'bg-primary/20',
+              text: 'text-primary',
+              border: 'border-primary/30'
+            },
+            Average: {
+              bg: 'bg-warning/20',
+              text: 'text-warning',
+              border: 'border-warning/30'
+            }
+          };
+
+          const fitStyles = fitColorMap[fitLevel] || fitColorMap.Average;
           
           return (
             <div key={idx} className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row gap-8 relative overflow-hidden group hover:border-primary/50 transition-colors">
@@ -220,7 +239,7 @@ const AIMatch = () => {
                      <span className="text-xs font-bold text-text-muted uppercase tracking-wider">AI Match Score</span>
                      <span className="text-2xl font-black text-primary">{match.algorithmScore}<span className="text-base text-text-muted font-normal">/100</span></span>
                    </div>
-                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border bg-${fitColor}/20 text-${fitColor} border-${fitColor}/30`}>
+                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border ${fitStyles.bg} ${fitStyles.text} ${fitStyles.border}`}>
                      {fitLevel} Fit
                    </span>
                  </div>
