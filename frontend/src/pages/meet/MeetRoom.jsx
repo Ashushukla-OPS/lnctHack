@@ -54,10 +54,27 @@ const MeetRoom = () => {
       try {
         const res = await axios.get(`/meet/room/${roomId}`);
         const info = res.data?.data || res.data;
+        
+        if (!info) {
+          throw new Error("Invalid meeting room data received");
+        }
+
+        const tId = info.teamId?._id || info.teamId || info.team?._id || info.team;
+
         if (info.status === 'ended') {
           toast.error('This meet has ended');
-          return navigate(`/teams/${info.team?._id || info.team}`);
+          return navigate(tId ? `/teams/${tId}` : '/teams');
         }
+
+        if (tId) {
+          try {
+            const teamRes = await axios.get(`/teams/${tId}`);
+            info.team = teamRes.data?.team || teamRes.data?.data || teamRes.data;
+          } catch (teamErr) {
+            console.error("Failed to fetch team details for meet", teamErr);
+          }
+        }
+
         setMeetInfo(info);
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
