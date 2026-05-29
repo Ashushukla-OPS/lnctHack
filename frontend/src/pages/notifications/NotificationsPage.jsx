@@ -31,7 +31,7 @@ const NotificationsPage = () => {
     try {
       setLoading(true);
       const res = await axios.get('/notifications');
-      setNotifications(res.data?.data || res.data || []);
+      setNotifications(res.data?.data?.notifications || res.data?.notifications || res.data?.data || res.data || []);
     } catch (error) {
       toast.error('Failed to load notifications');
     } finally {

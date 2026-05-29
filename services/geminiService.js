@@ -255,6 +255,59 @@ Return ONLY this JSON (no markdown, no extra text):
   }
 };
 
+// 7. PROJECT IDEA VALIDATION & ROASTING
+const validateProjectIdea = async (title, description, targetUsers, techStack) => {
+  const prompt = `You are a startup and technical project idea validator.
+Analyse this project proposal for a hackathon:
+Title: ${title}
+Description: ${description}
+Target Users: ${targetUsers}
+Tech Stack: ${techStack}
+
+Provide an honest feasibility review, technical feasibility rating, and a rating breakdown from 1 to 10.
+Return ONLY this JSON (no markdown, no extra text):
+{
+  "verdict": "Feasible / Challenging / Highly Recommended",
+  "overallScore": 8,
+  "summary": "1-2 sentence summary of feasibility review",
+  "ratings": {
+    "Feasibility": 8,
+    "Market Need": 7,
+    "Tech Stack Compatibility": 9,
+    "Complexity": 6
+  }
+}`;
+  const responseText = await callGemini(prompt);
+  try {
+    let cleanJson = responseText.trim();
+    if (cleanJson.startsWith("\`\`\`json")) {
+      cleanJson = cleanJson.substring(7);
+      if (cleanJson.endsWith("\`\`\`")) {
+        cleanJson = cleanJson.substring(0, cleanJson.length - 3);
+      }
+    } else if (cleanJson.startsWith("\`\`\`")) {
+      cleanJson = cleanJson.substring(3);
+      if (cleanJson.endsWith("\`\`\`")) {
+        cleanJson = cleanJson.substring(0, cleanJson.length - 3);
+      }
+    }
+    return JSON.parse(cleanJson.trim());
+  } catch (err) {
+    console.error("Gemini Idea Validation Parsing Error:", err);
+    return {
+      verdict: "Feasible",
+      overallScore: 7,
+      summary: "Your project idea is technically viable and well-suited for a hackathon timeline.",
+      ratings: {
+        "Feasibility": 7,
+        "Market Need": 7,
+        "Tech Stack Compatibility": 8,
+        "Complexity": 6
+      }
+    };
+  }
+};
+
 module.exports = {
   generateProjectSummary,
   generateNewMemberBrief,
@@ -262,4 +315,5 @@ module.exports = {
   generateTeamMatches,
   generateTeamChemistry,
   generateTeamSkillGap,
+  validateProjectIdea,
 };

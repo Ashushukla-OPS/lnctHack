@@ -91,7 +91,7 @@ const AIMatch = () => {
     );
   }
 
-  const openSlots = team.openSlots?.filter(s => !s.isFilled) || [];
+  const openSlots = team.openSlots?.filter(s => !(s.filled || s.isFilled)) || [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -167,8 +167,11 @@ const AIMatch = () => {
         )}
 
         {!analyzing && matches.length > 0 && matches.map((match, idx) => {
-          const u = match.user;
-          const fitLevel = match.algorithmScore >= 80 ? 'Strong' : match.algorithmScore >= 60 ? 'Good' : 'Average';
+          const u = match;
+          const candidateName = match.name || match.user?.name || "Anonymous";
+          const candidateTier = match.tier || match.user?.tier || "Beginner";
+          const candidateScore = match.totalScore !== undefined ? match.totalScore : (match.algorithmScore || 0);
+          const fitLevel = candidateScore >= 80 ? 'Strong' : candidateScore >= 60 ? 'Good' : 'Average';
           
           const fitColorMap = {
             Strong: {
@@ -189,19 +192,20 @@ const AIMatch = () => {
           };
 
           const fitStyles = fitColorMap[fitLevel] || fitColorMap.Average;
+          const userId = match.userId || match.user?._id;
           
           return (
             <div key={idx} className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row gap-8 relative overflow-hidden group hover:border-primary/50 transition-colors">
                {/* Left: Avatar & Basic */}
                <div className="flex flex-col items-center lg:items-start shrink-0 lg:w-48">
                  <div className="w-24 h-24 rounded-full bg-input border-4 border-main shadow-lg flex items-center justify-center text-3xl font-black text-text-primary mb-4">
-                   {u?.name?.charAt(0) || 'U'}
+                   {candidateName.charAt(0).toUpperCase()}
                  </div>
-                 <h3 className="font-bold text-lg text-text-primary text-center lg:text-left leading-tight mb-1">{u?.name}</h3>
+                 <h3 className="font-bold text-lg text-text-primary text-center lg:text-left leading-tight mb-1">{candidateName}</h3>
                  <span className="text-[10px] font-bold uppercase tracking-wider bg-input border border-border text-text-primary px-2 py-0.5 rounded mb-3">
-                   {u?.tier || 'Newbie'}
+                   {candidateTier}
                  </span>
-                 <button onClick={() => handleInvite(u?._id, match.targetRole)} className="w-full py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                 <button onClick={() => handleInvite(userId, match.targetRole)} className="w-full py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                    <UserPlusIcon className="w-4 h-4" /> Invite
                  </button>
                </div>
@@ -210,20 +214,20 @@ const AIMatch = () => {
                <div className="flex-1 flex flex-col justify-center border-y lg:border-y-0 lg:border-x border-border py-6 lg:py-0 lg:px-8">
                  <div className="flex items-center gap-4 mb-6">
                    <div className="text-center">
-                     <span className="block text-3xl font-black text-text-primary leading-none mb-1">{u?.score?.totalScore || 0}</span>
+                     <span className="block text-3xl font-black text-text-primary leading-none mb-1">{match.scores?.total || candidateScore}</span>
                      <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Total Score</span>
                    </div>
                    <div className="flex-1 grid grid-cols-2 gap-2 text-xs">
-                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted flex items-center gap-1"><CodeBracketIcon className="w-3 h-3"/> GitHub</span> <span className="font-semibold">{u?.score?.breakdown?.github || 0}</span></div>
-                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">LeetCode</span> <span className="font-semibold">{u?.score?.breakdown?.leetcode || 0}</span></div>
-                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">Codeforces</span> <span className="font-semibold">{u?.score?.breakdown?.codeforces || 0}</span></div>
-                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">Projects</span> <span className="font-semibold">{u?.score?.breakdown?.deployedProjects || 0}</span></div>
+                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted flex items-center gap-1"><CodeBracketIcon className="w-3 h-3"/> GitHub</span> <span className="font-semibold">{match.scores?.github || 0}</span></div>
+                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">LeetCode</span> <span className="font-semibold">{match.scores?.leetcode || 0}</span></div>
+                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">Codeforces</span> <span className="font-semibold">{match.scores?.cf || 0}</span></div>
+                     <div className="bg-main rounded px-2 py-1 flex justify-between items-center"><span className="text-text-muted">Projects</span> <span className="font-semibold">{match.scores?.projects || 0}</span></div>
                    </div>
                  </div>
                  <div>
                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Top Languages</p>
                    <div className="flex flex-wrap gap-1.5">
-                     {u?.topLanguages?.slice(0,5).map((lang, i) => (
+                     {(match.topLanguages || match.user?.skills || [])?.slice(0,5).map((lang, i) => (
                        <span key={i} className="bg-input border border-border px-2 py-0.5 rounded text-[11px] text-text-primary">
                          {lang}
                        </span>
@@ -237,7 +241,7 @@ const AIMatch = () => {
                  <div className="flex items-center justify-between mb-4">
                    <div className="flex items-center gap-2">
                      <span className="text-xs font-bold text-text-muted uppercase tracking-wider">AI Match Score</span>
-                     <span className="text-2xl font-black text-primary">{match.algorithmScore}<span className="text-base text-text-muted font-normal">/100</span></span>
+                     <span className="text-2xl font-black text-primary">{candidateScore}<span className="text-base text-text-muted font-normal">/100</span></span>
                    </div>
                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border ${fitStyles.bg} ${fitStyles.text} ${fitStyles.border}`}>
                      {fitLevel} Fit
@@ -249,14 +253,14 @@ const AIMatch = () => {
                  <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-xl mb-3">
                    <div className="flex items-start gap-2">
                      <SparklesIcon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                     <p className="text-sm text-text-primary leading-relaxed">{match.insight}</p>
+                     <p className="text-sm text-text-primary leading-relaxed">{match.whyGoodFit || match.insight}</p>
                    </div>
                  </div>
 
-                 {match.concerns && match.concerns !== "None" && (
+                 {(match.concern || match.concerns) && (match.concern || match.concerns) !== "None" && (
                    <div className="flex items-start gap-2 text-xs text-warning bg-warning/10 p-3 rounded-lg border border-warning/20">
                      <ExclamationCircleIcon className="w-4 h-4 shrink-0" />
-                     <p><strong>Concern:</strong> {match.concerns}</p>
+                     <p><strong>Concern:</strong> {match.concern || match.concerns}</p>
                    </div>
                  )}
                </div>

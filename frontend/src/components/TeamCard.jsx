@@ -37,9 +37,9 @@ const TeamCard = ({ team, isApplied, isMember, onInterest }) => {
       {/* Open slots list */}
       <div className="flex-1">
         <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Open Slots</h4>
-        {team.openSlots && team.openSlots.length > 0 ? (
+        {team.openSlots && team.openSlots.filter(slot => !(slot.filled || slot.isFilled)).length > 0 ? (
           <div className="space-y-3">
-            {team.openSlots.map((slot, idx) => (
+            {team.openSlots.filter(slot => !(slot.filled || slot.isFilled)).map((slot, idx) => (
               <div key={idx} className="bg-[#18181c]/50 p-3 rounded-xl border border-[#232329]">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-semibold text-white">{slot.role}</span>

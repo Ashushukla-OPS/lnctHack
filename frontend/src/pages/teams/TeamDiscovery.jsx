@@ -96,7 +96,7 @@ const TeamDiscovery = () => {
       (team.isRemote ? 'remote' : team.location?.toLowerCase() || '').includes(locationFilter.toLowerCase()) 
       : true;
     
-    const matchesRole = selectedRole ? team.openSlots?.some(slot => slot.role?.toLowerCase().includes(selectedRole.toLowerCase())) : true;
+    const matchesRole = selectedRole ? team.openSlots?.some(slot => !(slot.filled || slot.isFilled) && slot.role?.toLowerCase().includes(selectedRole.toLowerCase())) : true;
 
     return matchesSearch && matchesHackathon && matchesLocation && matchesRole;
   });
@@ -254,7 +254,7 @@ const TeamDiscovery = () => {
                   onChange={(e) => setApplyRole(e.target.value)}
                   className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500 transition-all font-medium appearance-none cursor-pointer"
                 >
-                  {selectedTeam.openSlots?.map((slot, idx) => (
+                  {selectedTeam.openSlots?.filter(slot => !(slot.filled || slot.isFilled)).map((slot, idx) => (
                     <option key={idx} value={slot.role}>{slot.role}</option>
                   ))}
                 </select>

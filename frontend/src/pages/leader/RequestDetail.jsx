@@ -69,7 +69,7 @@ const RequestDetail = () => {
   if (loading) return <div className="flex justify-center items-center h-screen"><LoadingSpinner /></div>;
   if (!request) return null;
 
-  const sender = request.user;
+  const sender = request.sender || request.user;
   const team = request.team;
   const isPending = request.status === 'pending';
 
@@ -99,7 +99,7 @@ const RequestDetail = () => {
                       {sender?.tier || 'Newbie'}
                     </span>
                     <span className="text-xs font-medium text-text-muted flex items-center gap-1">
-                      <StarIcon className="w-3.5 h-3.5 text-warning" /> {sender?.score?.totalScore || 0} Rep
+                      <StarIcon className="w-3.5 h-3.5 text-warning" /> {sender?.scores?.total || sender?.score?.totalScore || 0} Rep
                     </span>
                   </div>
                 </div>
@@ -158,22 +158,22 @@ const RequestDetail = () => {
             <h3 className="text-lg font-semibold text-text-primary mb-6 text-center border-b border-border pb-4">Applicant Scorecard</h3>
             
             <div className="text-center mb-6">
-              <span className="text-4xl font-black text-primary">{sender?.score?.totalScore || 0}</span>
+              <span className="text-4xl font-black text-primary">{sender?.scores?.total || sender?.score?.totalScore || 0}</span>
               <span className="text-text-muted font-medium ml-1">/ 1000</span>
             </div>
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-text-muted flex items-center gap-1.5"><CodeBracketIcon className="w-4 h-4"/> GitHub</span>
-                <span className="font-medium text-text-primary">{sender?.score?.breakdown?.github || 0}</span>
+                <span className="font-medium text-text-primary">{sender?.scores?.github || sender?.score?.breakdown?.github || 0}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-text-muted flex items-center gap-1.5"><span className="font-mono">LC</span> LeetCode</span>
-                <span className="font-medium text-text-primary">{sender?.score?.breakdown?.leetcode || 0}</span>
+                <span className="font-medium text-text-primary">{sender?.scores?.leetcode || sender?.score?.breakdown?.leetcode || 0}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-text-muted flex items-center gap-1.5"><span className="font-mono">CF</span> Codeforces</span>
-                <span className="font-medium text-text-primary">{sender?.score?.breakdown?.codeforces || 0}</span>
+                <span className="font-medium text-text-primary">{sender?.scores?.cf || sender?.scores?.codeforces || sender?.score?.breakdown?.codeforces || 0}</span>
               </div>
             </div>
 
@@ -195,7 +195,7 @@ const RequestDetail = () => {
             <div>
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Deployed Projects</p>
               <span className="font-medium text-text-primary bg-input px-3 py-1 rounded-lg text-sm border border-border">
-                {sender?.score?.breakdown?.deployedProjects || 0}
+                {sender?.scores?.projects || sender?.score?.breakdown?.deployedProjects || 0}
               </span>
             </div>
           </div>

@@ -148,7 +148,7 @@ const TaskBoard = ({ isEmbed = false, teamId: propTeamId }) => {
     setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
     
     try {
-      await axios.patch(`/tasks/${taskId}/status`, { status: newStatus });
+      await axios.patch(`/tasks/${taskId}`, { status: newStatus });
       // Socket handles broadcast
     } catch (error) {
       toast.error('Failed to update status');

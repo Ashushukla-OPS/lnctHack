@@ -24,7 +24,8 @@ const CreateTeam = () => {
     const fetchHackathons = async () => {
       try {
         const res = await axios.get('/hackathon');
-        setHackathons(res.data?.data || res.data || []);
+        const hackathonList = res.data?.hackathons || res.data?.data || res.data || [];
+        setHackathons(Array.isArray(hackathonList) ? hackathonList : []);
       } catch (error) {
         toast.error('Failed to load hackathons');
       } finally {
@@ -176,7 +177,7 @@ const CreateTeam = () => {
                 disabled={initialLoading}
               >
                 <option value="">Select a hackathon</option>
-                {hackathons.map(h => (
+                {Array.isArray(hackathons) && hackathons.map(h => (
                   <option key={h._id} value={h._id}>{h.name}</option>
                 ))}
               </select>

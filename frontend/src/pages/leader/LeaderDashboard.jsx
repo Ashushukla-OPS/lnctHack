@@ -53,7 +53,12 @@ const LeaderDashboard = () => {
       ]);
 
       const allTeams = teamsRes.data?.teams || teamsRes.data?.data || teamsRes.data || [];
-      const leaderTeams = allTeams.filter(t => t.leader?._id === user?._id || t.leader === user?._id);
+      const leaderTeams = allTeams.filter(t => {
+        const leaderId = typeof t.leader === 'object' ? t.leader?._id : t.leader;
+        const leaderIdStr = leaderId ? String(leaderId).trim().toLowerCase() : '';
+        const userIdStr = user?._id ? String(user._id).trim().toLowerCase() : '';
+        return leaderIdStr === userIdStr;
+      });
       setMyTeams(leaderTeams);
       
       if (leaderTeams.length > 0 && !activeTeamId) {
@@ -192,8 +197,17 @@ const LeaderDashboard = () => {
     );
   }
 
-  const activeTeam = myTeams.find(t => t._id === activeTeamId);
-  const activeTeamRequests = incomingRequests.filter(req => req.team?._id === activeTeamId && req.status === 'pending');
+  const activeTeam = myTeams.find(t => {
+    const activeIdStr = activeTeamId ? String(activeTeamId).trim().toLowerCase() : '';
+    const teamIdStr = t._id ? String(t._id).trim().toLowerCase() : '';
+    return teamIdStr === activeIdStr;
+  });
+  const activeTeamRequests = incomingRequests.filter(req => {
+    const reqTeamId = typeof req.team === 'object' ? req.team?._id : req.team;
+    const teamIdStr = reqTeamId ? String(reqTeamId).trim().toLowerCase() : '';
+    const activeIdStr = activeTeamId ? String(activeTeamId).trim().toLowerCase() : '';
+    return teamIdStr === activeIdStr && req.status === 'pending';
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -252,16 +266,16 @@ const LeaderDashboard = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-input flex items-center justify-center font-bold text-text-primary">
-                            {req.user?.name?.charAt(0) || 'U'}
+                            {(req.sender || req.user)?.name?.charAt(0) || 'U'}
                           </div>
                           <div>
-                            <p className="font-semibold text-text-primary">{req.user?.name}</p>
+                            <p className="font-semibold text-text-primary">{(req.sender || req.user)?.name}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/30 uppercase tracking-wide">
-                                {req.user?.tier || 'Newbie'}
+                              <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/30 uppercase tracking-wide font-semibold">
+                                {(req.sender || req.user)?.tier || 'Newbie'}
                               </span>
                               <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded border border-warning/30 flex items-center gap-1">
-                                ⭐ {req.user?.score?.totalScore || 0}
+                                ⭐ {(req.sender || req.user)?.scores?.total || (req.sender || req.user)?.score?.totalScore || 0}
                               </span>
                             </div>
                           </div>
@@ -317,7 +331,7 @@ const LeaderDashboard = () => {
                           Min Score: <span className="font-medium text-warning">{slot.minScore || 0}</span>
                         </p>
                       </div>
-                      {slot.isFilled ? (
+                      {slot.filled || slot.isFilled ? (
                         <span className="text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded border border-success/30 font-bold uppercase tracking-wider">Filled</span>
                       ) : (
                         <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/30 font-bold uppercase tracking-wider">Open</span>
@@ -334,7 +348,7 @@ const LeaderDashboard = () => {
 
                     <div className="flex justify-between items-center pt-3 border-t border-border">
                       <div className="text-xs text-text-muted">
-                        {slot.isFilled ? (
+                        {slot.filled || slot.isFilled ? (
                           <span>Filled by: <span className="font-medium text-text-primary">{slot.filledBy?.name || 'Member'}</span></span>
                         ) : (
                           <span>Requests: <span className="bg-input px-1.5 py-0.5 rounded">{incomingRequests.filter(r => r.team?._id === activeTeam._id && r.appliedRole === slot.role && r.status === 'pending').length}</span></span>
@@ -344,7 +358,7 @@ const LeaderDashboard = () => {
                         <button onClick={() => openEditSlot(slot)} className="p-1.5 text-text-muted hover:text-primary hover:bg-input rounded transition-colors" title="Edit">
                           <PencilIcon className="w-4 h-4" />
                         </button>
-                        {!slot.isFilled && (
+                        {!(slot.filled || slot.isFilled) && (
                           <button onClick={() => handleRemoveSlot(activeTeam._id, slot._id)} className="p-1.5 text-text-muted hover:text-danger hover:bg-danger/10 rounded transition-colors" title="Remove">
                             <TrashIcon className="w-4 h-4" />
                           </button>

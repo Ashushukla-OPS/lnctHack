@@ -38,16 +38,16 @@ const HackathonDetails = () => {
         axios.get(`/teams`)
       ]);
       
-      const hData = hRes.data?.data || hRes.data;
+      const hData = hRes.data?.hackathon || hRes.data?.data || hRes.data;
       setHackathon(hData);
       
       if (timerRes.data) {
         setTimerData(timerRes.data?.data || timerRes.data);
       }
 
-      const allTeams = teamsRes.data?.data || teamsRes.data || [];
+      const allTeams = teamsRes.data?.teams || teamsRes.data?.data || [];
       // Filter teams that belong to this hackathon
-      const hTeams = allTeams.filter(t => t.hackathon?._id === id || t.hackathon === id);
+      const hTeams = Array.isArray(allTeams) ? allTeams.filter(t => t.hackathon?._id === id || t.hackathon === id) : [];
       setTeams(hTeams);
 
     } catch (error) {
@@ -188,7 +188,7 @@ const HackathonDetails = () => {
                 <h3 className="font-bold text-text-primary text-lg mb-4">{team.teamName || team.name}</h3>
                 <div className="flex justify-between items-center text-sm text-text-muted mb-4 mt-auto">
                   <span className="flex items-center gap-1.5"><UserGroupIcon className="w-4 h-4"/> {team.members?.length || 0} Members</span>
-                  <span className="font-medium text-warning bg-warning/10 px-2 py-0.5 rounded">{team.openSlots?.filter(s => !s.isFilled).length || 0} Open Slots</span>
+                  <span className="font-medium text-warning bg-warning/10 px-2 py-0.5 rounded">{team.openSlots?.filter(s => !(s.filled || s.isFilled)).length || 0} Open Slots</span>
                 </div>
                 <Link to={`/teams/${team._id}`} className="w-full text-center py-2 bg-input hover:bg-primary hover:text-white border border-border rounded-lg text-sm font-medium transition-colors">
                   View Team

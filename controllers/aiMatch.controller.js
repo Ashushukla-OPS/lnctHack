@@ -2,6 +2,8 @@ const MatchCache = require("../models/MatchCache");
 const { generateMatchDataService } = require("../services/aiMatch.service");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require("../utils/apiResponse");
+const ApiError = require("../utils/apiError");
+const { validateProjectIdea } = require("../services/geminiService");
 
 const getAiMatchesController = asyncHandler(async (req, res) => {
   const { teamId } = req.params;
@@ -55,8 +57,21 @@ const getAiSkillGapController = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse("Team skill gap analyzed successfully", result));
 });
 
+const getAiIdeaValidationController = asyncHandler(async (req, res) => {
+  const { teamId } = req.params;
+  const { title, description, targetUsers, techStack } = req.body;
+
+  if (!title || !description) {
+    throw new ApiError(400, "Title and description are required for idea validation");
+  }
+
+  const result = await validateProjectIdea(title, description, targetUsers, techStack);
+  return res.status(200).json(new ApiResponse("Project idea validated successfully", result));
+});
+
 module.exports = {
   getAiMatchesController,
   getAiChemistryController,
   getAiSkillGapController,
+  getAiIdeaValidationController,
 };

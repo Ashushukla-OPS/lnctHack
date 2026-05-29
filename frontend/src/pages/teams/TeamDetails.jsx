@@ -144,7 +144,7 @@ const TeamDetails = () => {
     setAiLoading(prev => ({...prev, match: true}));
     try {
       const res = await axios.get(`/ai/match/${teamId}`);
-      setAiMatch(res.data?.data || res.data || []);
+      setAiMatch(res.data?.data?.matches || res.data?.matches || res.data?.data || res.data || []);
     } catch (err) { toast.error('Matchmaker failed'); }
     finally { setAiLoading(prev => ({...prev, match: false})); }
   };
@@ -285,7 +285,7 @@ const TeamDetails = () => {
                           <div>
                             <p className="font-bold text-white flex items-center gap-2">
                               {slot.role}
-                              {slot.isFilled ? (
+                              {slot.filled || slot.isFilled ? (
                                 <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase tracking-wider">FILLED</span>
                               ) : (
                                 <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20 font-bold uppercase tracking-wider">OPEN</span>
@@ -514,14 +514,24 @@ const TeamDetails = () => {
                           <div key={i} className="bg-[#16161a]/60 border border-[#232329] p-5 rounded-xl flex flex-col justify-between hover:border-violet-500/20 transition-all">
                             <div>
                               <div className="flex justify-between items-start mb-3">
-                                <p className="font-bold text-white text-sm">{match.user?.name}</p>
+                                <p className="font-bold text-white text-sm">{match.name || match.user?.name}</p>
                                 <span className="text-[10px] font-black bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                                   Fit: {match.fitRating}/10
                                 </span>
                               </div>
-                              <p className="text-xs text-text-muted font-medium leading-relaxed mb-4">{match.insight}</p>
+                              <p className="text-xs text-text-muted font-medium leading-relaxed mb-4">{match.whyGoodFit || match.insight}</p>
                             </div>
-                            <button className="w-full py-2 bg-[#1e1e24] hover:bg-[#25252d] border border-[#2c2c35] text-violet-400 rounded-lg text-xs font-bold transition-all mt-auto flex items-center justify-center gap-1.5">
+                            <button 
+                              onClick={() => {
+                                axios.post('/join-request/send', { 
+                                  teamId, 
+                                  appliedRole: match.targetRole || (team.openSlots?.find(s => !s.filled)?.role || ''),
+                                  message: 'Hello! Our AI matched your profile with our open slot. Would you be interested in joining?',
+                                  isInvite: true
+                                }).then(() => toast.success('Invite sent!')).catch(() => toast.error('Failed to send invite'));
+                              }}
+                              className="w-full py-2 bg-[#1e1e24] hover:bg-[#25252d] border border-[#2c2c35] text-violet-400 rounded-lg text-xs font-bold transition-all mt-auto flex items-center justify-center gap-1.5"
+                            >
                               <span>✉</span> Invite Teammate
                             </button>
                           </div>

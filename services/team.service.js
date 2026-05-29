@@ -77,11 +77,27 @@ let getAllTeamsService = async () => {
     )
 
     .populate(
+      "openSlots.filledBy",
+      "name email"
+    )
+
+    .populate(
+      "hackathonId",
+      "name startDate location description organizer mode"
+    )
+
+    .populate(
       "taskBoard.assignee",
       "name email"
     );
 
-  return teams;
+  return teams.map(t => {
+    const obj = t.toObject ? t.toObject() : t;
+    if (obj.hackathonId) {
+      obj.hackathon = obj.hackathonId;
+    }
+    return obj;
+  });
 };
 
 
@@ -110,6 +126,16 @@ let getSingleTeamService = async (
     )
 
     .populate(
+      "openSlots.filledBy",
+      "name email"
+    )
+
+    .populate(
+      "hackathonId",
+      "name startDate location description organizer mode"
+    )
+
+    .populate(
       "taskBoard.assignee",
       "name email"
     );
@@ -122,7 +148,11 @@ let getSingleTeamService = async (
     );
   }
 
-  return team;
+  const obj = team.toObject ? team.toObject() : team;
+  if (obj.hackathonId) {
+    obj.hackathon = obj.hackathonId;
+  }
+  return obj;
 };
 
 
