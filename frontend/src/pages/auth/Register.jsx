@@ -68,167 +68,211 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-4 py-8 text-[#f1f5f9] font-sans">
-      <div className="w-full max-w-xl space-y-6 rounded-2xl border border-[#2e2e2e] bg-[#1a1a1a] p-8 shadow-2xl transition-all duration-300 hover:border-indigo-500/30">
-        
-        {/* Header Title */}
-        <div className="text-center space-y-1">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-lg font-bold text-white shadow-lg">
+    <div className="min-h-screen flex flex-col justify-between bg-[#0c0c0e] relative overflow-hidden font-sans">
+      {/* Neon Purple/Indigo Orb Backdrops */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Clean Navbar */}
+      <header className="px-8 py-5 flex items-center justify-between z-10 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white font-display font-extrabold text-sm shadow-md shadow-violet-600/20">
             P
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Create your ProvenStack Account</h2>
-          <p className="text-xs text-[#94a3b8]">Join team forming hackathons in India & globally</p>
+          <span className="font-display font-bold text-lg tracking-tight text-white">
+            ProvenStack <span className="text-gradient">Hub</span>
+          </span>
         </div>
+      </header>
 
-        {/* Form Container */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Main card viewport */}
+      <main className="flex-1 flex justify-center items-center px-4 py-8 z-10 shrink-0">
+        <div className="w-full max-w-2xl glass-card p-8 sm:p-10 border border-[#232329] bg-[#141417]/85 backdrop-blur-md shadow-2xl transition-all duration-300">
           
-          {/* Section: Core Profile Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            {/* Full Name */}
-            <div>
-              <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                placeholder="John Doe"
-              />
-            </div>
-
-            {/* Email Address */}
-            <div>
-              <label htmlFor="email" className="block text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                placeholder="john@example.com"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                Password <span className="text-red-500">*</span> (min 6)
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {/* Location / City */}
-            <div>
-              <label htmlFor="location" className="block text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                Location / City <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="location"
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                placeholder="Bangalore, Karnataka"
-              />
-            </div>
-
+          {/* Header */}
+          <div className="text-center space-y-2 mb-6">
+            <h2 className="font-display font-extrabold text-2xl text-white tracking-tight">
+              Create your Account
+            </h2>
+            <p className="text-xs text-text-muted font-medium">
+              Join ProvenStack to form high-chemistry hackathon projects
+            </p>
           </div>
 
-          {/* Section: Tech Platform Handles (Optional) */}
-          <div className="border-t border-[#2e2e2e] pt-4">
-            <h3 className="text-xs font-semibold text-indigo-400 mb-3 tracking-wide">Tech Platforms & Developer Handles</h3>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              
-              {/* GitHub Handle */}
-              <div>
-                <label htmlFor="github" className="block text-[9px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                  GitHub Username
+            {/* Core Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Full Name */}
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
-                <input
-                  id="github"
-                  type="text"
-                  value={github}
-                  onChange={(e) => setGithub(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  placeholder="github-profile"
-                />
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs select-none">
+                    👤
+                  </span>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#232329] bg-[#16161a] text-sm text-white placeholder-text-muted/40 shadow-inner outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="John Doe"
+                  />
+                </div>
               </div>
 
-              {/* LeetCode Handle */}
-              <div>
-                <label htmlFor="leetcode" className="block text-[9px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                  LeetCode Handle
+              {/* Email Address */}
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                  Email <span className="text-red-500">*</span>
                 </label>
-                <input
-                  id="leetcode"
-                  type="text"
-                  value={leetcode}
-                  onChange={(e) => setLeetcode(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  placeholder="leetcode-profile"
-                />
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs select-none">
+                    ✉️
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#232329] bg-[#16161a] text-sm text-white placeholder-text-muted/40 shadow-inner outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="john@example.com"
+                  />
+                </div>
               </div>
 
-              {/* Codeforces Handle */}
-              <div>
-                <label htmlFor="codeforces" className="block text-[9px] font-bold uppercase tracking-wider text-[#94a3b8]">
-                  Codeforces Handle
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                  Password <span className="text-red-500">*</span> (min 6)
                 </label>
-                <input
-                  id="codeforces"
-                  type="text"
-                  value={codeforces}
-                  onChange={(e) => setCodeforces(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-[#2e2e2e] bg-[#242424] px-3 py-2 text-sm text-white placeholder-[#94a3b8]/30 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  placeholder="cf-profile"
-                />
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs select-none">
+                    🔒
+                  </span>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#232329] bg-[#16161a] text-sm text-white placeholder-text-muted/40 shadow-inner outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="••••••••"
+                  />
+                </div>
               </div>
 
+              {/* Location */}
+              <div className="space-y-1.5">
+                <label htmlFor="location" className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                  Location / City <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs select-none">
+                    📍
+                  </span>
+                  <input
+                    id="location"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#232329] bg-[#16161a] text-sm text-white placeholder-text-muted/40 shadow-inner outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="Bangalore, Karnataka"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Submit Action */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-6 flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition-all duration-150 hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
-          >
-            {isSubmitting ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-            ) : (
-              "Create Account"
-            )}
-          </button>
+            {/* Developer handles */}
+            <div className="border-t border-[#232329] pt-4 space-y-4">
+              <h3 className="text-xs font-semibold text-primary tracking-wide">Developer Handles & Platform Sync</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                
+                {/* GitHub */}
+                <div className="space-y-1.5">
+                  <label htmlFor="github" className="block text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                    GitHub Username
+                  </label>
+                  <input
+                    id="github"
+                    type="text"
+                    value={github}
+                    onChange={(e) => setGithub(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-[#232329] bg-[#16161a] text-xs text-white placeholder-text-muted/40 outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="github-username"
+                  />
+                </div>
 
-        </form>
+                {/* LeetCode */}
+                <div className="space-y-1.5">
+                  <label htmlFor="leetcode" className="block text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                    LeetCode Handle
+                  </label>
+                  <input
+                    id="leetcode"
+                    type="text"
+                    value={leetcode}
+                    onChange={(e) => setLeetcode(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-[#232329] bg-[#16161a] text-xs text-white placeholder-text-muted/40 outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="leetcode-handle"
+                  />
+                </div>
 
-        {/* Footer Navigation */}
-        <p className="text-center text-xs text-[#94a3b8] pt-2 border-t border-[#2e2e2e]/50">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
-            Login
-          </Link>
-        </p>
+                {/* Codeforces */}
+                <div className="space-y-1.5">
+                  <label htmlFor="codeforces" className="block text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                    Codeforces Handle
+                  </label>
+                  <input
+                    id="codeforces"
+                    type="text"
+                    value={codeforces}
+                    onChange={(e) => setCodeforces(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-[#232329] bg-[#16161a] text-xs text-white placeholder-text-muted/40 outline-none transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium"
+                    placeholder="cf-handle"
+                  />
+                </div>
 
-      </div>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full btn-primary py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 mt-6 shadow-lg shadow-violet-500/10"
+            >
+              {isSubmitting ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <span className="text-xs">➜</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Footer Link */}
+          <p className="text-center text-xs text-text-muted mt-6 pt-4 border-t border-[#232329]/50">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-primary hover:underline transition-colors font-sans"
+            >
+              Login Here
+            </Link>
+          </p>
+
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-4 text-center text-[10px] text-text-muted z-10 shrink-0 select-none">
+        <p>© 2026 ProvenStack Platform. All rights reserved.</p>
+      </footer>
     </div>
   );
 };
