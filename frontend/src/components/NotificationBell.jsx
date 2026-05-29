@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import axios from '../utils/axios';
+import { formatDistanceToNow } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,20 +21,66 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Placeholder for real notification fetching/socket logic
+  const fetchNotifications = async () => {
+    try {
+      const [notifRes, unreadRes] = await Promise.all([
+        axios.get('/notifications?limit=5'),
+        axios.get('/notifications/unread-count')
+      ]);
+      
+      const fetchedNotifications = notifRes.data?.data?.notifications || notifRes.data?.notifications || [];
+      const fetchedCount = unreadRes.data?.data?.count || unreadRes.data?.count || 0;
+      
+      setNotifications(fetchedNotifications);
+      setUnreadCount(fetchedCount);
+    } catch (error) {
+      console.error('Failed to fetch notifications', error);
+    }
+  };
+
   useEffect(() => {
-    // mock data
-    setNotifications([
-      { id: 1, title: 'Team Invite', message: 'You were invited to NeoHackers', time: '5m ago', read: false },
-      { id: 2, title: 'Profile Updated', message: 'Your GitHub stats were synced', time: '1h ago', read: true }
-    ]);
-    setUnreadCount(1);
+    fetchNotifications();
+    
+    // Poll every 30 seconds for new notifications
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleToggleOpen = () => {
+    if (!isOpen) {
+      fetchNotifications();
+    }
+    setIsOpen(!isOpen);
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await axios.patch('/notifications/read-all');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+      toast.success('All marked as read');
+    } catch (error) {
+      toast.error('Failed to mark all as read');
+    }
+  };
+
+  const handleNotificationClick = async (notif) => {
+    if (!notif.isRead) {
+      try {
+        await axios.patch(`/notifications/read/${notif._id}`);
+        setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      } catch (err) {
+        console.error('Failed to mark notification as read', err);
+      }
+    }
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggleOpen}
         className="relative p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-input transition-colors focus:outline-none"
       >
         <BellIcon className="w-6 h-6" />
@@ -46,27 +95,37 @@ const NotificationBell = () => {
             <h3 className="font-semibold text-text-primary">Notifications</h3>
             {unreadCount > 0 && (
               <button
-                className="text-xs text-primary hover:text-primary/80"
-                onClick={() => setUnreadCount(0)}
+                className="text-xs text-primary hover:text-primary/80 font-medium"
+                onClick={handleMarkAllRead}
               >
-                Mark all as read
+                Mark all read
               </button>
             )}
           </div>
-          <div className="max-h-[300px] overflow-y-auto">
+          <div className="max-h-[300px] overflow-y-auto divide-y divide-border">
             {notifications.length > 0 ? (
               notifications.map((notif) => (
                 <div
-                  key={notif.id}
-                  className={`p-4 border-b border-border last:border-0 hover:bg-input/30 transition-colors ${
-                    !notif.read ? 'bg-primary/5' : ''
+                  key={notif._id}
+                  onClick={() => handleNotificationClick(notif)}
+                  className={`p-4 hover:bg-input/30 cursor-pointer transition-colors relative ${
+                    !notif.isRead ? 'bg-primary/5' : ''
                   }`}
                 >
-                  <div className="flex justify-between items-start">
-                    <p className="text-sm font-medium text-text-primary">{notif.title}</p>
-                    <span className="text-xs text-text-muted whitespace-nowrap ml-2">{notif.time}</span>
+                  {!notif.isRead && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r"></div>
+                  )}
+                  <div className="flex justify-between items-start mb-1">
+                    <p className={`text-xs font-semibold uppercase tracking-wider ${!notif.isRead ? 'text-primary' : 'text-text-muted'}`}>
+                      {notif.type?.replace(/_/g, ' ') || 'Alert'}
+                    </p>
+                    <span className="text-[10px] text-text-muted whitespace-nowrap ml-2">
+                      {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                    </span>
                   </div>
-                  <p className="text-sm text-text-muted mt-1">{notif.message}</p>
+                  <p className={`text-sm text-text-primary ${!notif.isRead ? 'font-medium' : 'font-normal'}`}>
+                    {notif.message}
+                  </p>
                 </div>
               ))
             ) : (
@@ -74,6 +133,11 @@ const NotificationBell = () => {
                 <p>No new notifications</p>
               </div>
             )}
+          </div>
+          <div className="p-3 border-t border-border text-center bg-input/20">
+            <Link to="/notifications" onClick={() => setIsOpen(false)} className="text-xs text-primary font-medium hover:underline">
+              View all notifications
+            </Link>
           </div>
         </div>
       )}
