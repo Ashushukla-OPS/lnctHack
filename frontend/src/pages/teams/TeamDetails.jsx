@@ -54,7 +54,7 @@ const TeamDetails = () => {
     try {
       setLoading(true);
       const res = await axios.get(`/teams/${teamId}`);
-      setTeam(res.data?.data || res.data);
+      setTeam(res.data?.team || res.data?.data || res.data);
       // Try to preload chemistry
       const chemRes = await axios.get(`/ai/chemistry/${teamId}`).catch(() => null);
       if (chemRes) setChemistry(chemRes.data?.data || chemRes.data);
@@ -175,7 +175,7 @@ const TeamDetails = () => {
           <ArrowLeftIcon className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">{team.name}</h1>
+          <h1 className="text-3xl font-bold text-text-primary">{team.teamName || team.name}</h1>
           {team.hackathon && (
             <p className="text-sm text-text-muted mt-1">Hackathon: {team.hackathon.name}</p>
           )}
