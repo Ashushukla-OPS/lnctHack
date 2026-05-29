@@ -12,6 +12,7 @@ const CreateTeam = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     hackathon: '',
     isOpen: true,
     openSlots: [
@@ -90,6 +91,7 @@ const CreateTeam = () => {
     e.preventDefault();
 
     if (!formData.name) return toast.error('Team name is required');
+    if (!formData.description) return toast.error('Team description is required');
     if (!formData.hackathon) return toast.error('Please select a hackathon');
     if (formData.openSlots.length === 0) return toast.error('At least one open slot is required');
     
@@ -99,8 +101,9 @@ const CreateTeam = () => {
 
     // Clean data payload
     const payload = {
-      name: formData.name,
-      hackathon: formData.hackathon,
+      teamName: formData.name,
+      description: formData.description,
+      hackathonId: formData.hackathon,
       isOpen: formData.isOpen,
       openSlots: formData.openSlots.map(slot => ({
         role: slot.role,
@@ -145,6 +148,19 @@ const CreateTeam = () => {
                 onChange={handleChange}
                 placeholder="e.g. NeoHackers"
                 className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-muted mb-1">Description <span className="text-danger">*</span></label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Describe your project, team goals, and what you're building..."
+                rows={3}
+                className="w-full bg-input border border-border rounded-lg px-4 py-2 text-text-primary focus:outline-none focus:border-primary transition-colors resize-none"
                 required
               />
             </div>
