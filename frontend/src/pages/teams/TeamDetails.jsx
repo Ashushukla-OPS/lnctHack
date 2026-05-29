@@ -7,7 +7,8 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import Modal from '../../components/Modal';
 import toast from 'react-hot-toast';
-import { TeamChat, TaskBoard } from '../PlaceholderPages';
+import TeamChat from '../chat/TeamChat';
+import TaskBoard from '../tasks/TaskBoard';
 import { 
   ArrowLeftIcon,
   VideoCameraIcon,
@@ -332,13 +333,13 @@ const TeamDetails = () => {
 
         {activeTab === 'chat' && (
           <div className="bg-card border border-border rounded-xl h-[600px] overflow-hidden">
-             {isMember ? <TeamChat teamId={teamId} /> : <div className="p-8 text-center text-text-muted">Members only feature.</div>}
+             {isMember ? <TeamChat isEmbed={true} teamId={teamId} /> : <div className="p-8 text-center text-text-muted">Members only feature.</div>}
           </div>
         )}
 
         {activeTab === 'tasks' && (
           <div className="bg-card border border-border rounded-xl min-h-[600px]">
-             {isMember ? <TaskBoard teamId={teamId} /> : <div className="p-8 text-center text-text-muted">Members only feature.</div>}
+             {isMember ? <TaskBoard isEmbed={true} teamId={teamId} /> : <div className="p-8 text-center text-text-muted">Members only feature.</div>}
           </div>
         )}
 

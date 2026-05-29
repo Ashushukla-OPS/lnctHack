@@ -16,8 +16,9 @@ import {
   ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
-const TaskBoard = () => {
-  const { teamId } = useParams();
+const TaskBoard = ({ isEmbed = false, teamId: propTeamId }) => {
+  const { teamId: paramTeamId } = useParams();
+  const teamId = propTeamId || paramTeamId;
   const { user } = useAuth();
   const socket = useSocket();
   
@@ -169,7 +170,13 @@ const TaskBoard = () => {
     return 'text-text-muted';
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><LoadingSpinner /></div>;
+  if (loading) {
+    return (
+      <div className={`flex justify-center items-center ${isEmbed ? "h-[400px]" : "h-screen"}`}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
   if (!team) return null;
 
   const columns = [
@@ -179,13 +186,15 @@ const TaskBoard = () => {
   ];
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
+    <div className={isEmbed ? "w-full p-6 flex flex-col overflow-hidden h-[600px]" : "max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col"}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 shrink-0">
         <div>
-          <Link to={`/teams/${teamId}`} className="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors mb-2">
-            <ArrowLeftIcon className="w-4 h-4" /> Back to Team
-          </Link>
+          {!isEmbed && (
+            <Link to={`/teams/${teamId}`} className="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors mb-2">
+              <ArrowLeftIcon className="w-4 h-4" /> Back to Team
+            </Link>
+          )}
           <h1 className="text-3xl font-bold text-text-primary flex items-center gap-3">
             Task Board <span className="text-xl font-normal text-text-muted">• {team.teamName || team.name}</span>
           </h1>
