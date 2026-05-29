@@ -52,7 +52,7 @@ const LeaderDashboard = () => {
         axios.get('/join-request/incoming')
       ]);
 
-      const allTeams = teamsRes.data?.data || teamsRes.data || [];
+      const allTeams = teamsRes.data?.teams || teamsRes.data?.data || teamsRes.data || [];
       const leaderTeams = allTeams.filter(t => t.leader?._id === user?._id || t.leader === user?._id);
       setMyTeams(leaderTeams);
       
@@ -215,7 +215,7 @@ const LeaderDashboard = () => {
                   : 'border-transparent text-text-muted hover:text-text-primary hover:border-border'
               }`}
             >
-              {team.name}
+              {team.teamName || team.name}
             </button>
           ))}
         </nav>
@@ -226,7 +226,7 @@ const LeaderDashboard = () => {
           {/* Team Overview Row */}
           <div className="bg-card border border-border rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h2 className="text-xl font-bold text-text-primary">{activeTeam.name}</h2>
+              <h2 className="text-xl font-bold text-text-primary">{activeTeam.teamName || activeTeam.name}</h2>
               <p className="text-sm text-text-muted mt-1">{activeTeam.hackathon?.name || 'No hackathon linked'}</p>
               <p className="text-sm text-text-primary mt-2">
                 <span className="text-text-muted">Members:</span> {activeTeam.members?.length || 0} / {(activeTeam.members?.length || 0) + (activeTeam.openSlots?.length || 0)}

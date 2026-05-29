@@ -114,7 +114,7 @@ const RequestDetail = () => {
 
             <div className="mb-6">
               <p className="text-sm font-medium text-text-muted mb-2">Target Team</p>
-              <p className="font-semibold text-text-primary">{team?.name}</p>
+              <p className="font-semibold text-text-primary">{team?.teamName || team?.name}</p>
             </div>
 
             <div className="mb-6">
