@@ -157,25 +157,28 @@ const TeamDiscovery = () => {
           </div>
           
           {/* Hackathon Filter */}
-          <div className="relative">
+          <div className="relative flex items-center">
             <select
               value={selectedHackathon}
               onChange={(e) => setSelectedHackathon(e.target.value)}
-              className="w-full bg-[#16161a] border border-[#232329] rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
             >
               <option value="">All Hackathons</option>
               {hackathons.map(h => (
                 <option key={h._id} value={h._id}>{h.name}</option>
               ))}
             </select>
+            <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
 
           {/* Specialty Role Filter */}
-          <div className="relative">
+          <div className="relative flex items-center">
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full bg-[#16161a] border border-[#232329] rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
+              className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/10 font-medium transition-all appearance-none cursor-pointer"
             >
               <option value="">All Specialties</option>
               <option value="frontend">Frontend Experts</option>
@@ -184,6 +187,9 @@ const TeamDiscovery = () => {
               <option value="design">UI/UX Designers</option>
               <option value="ai">AI / ML Coders</option>
             </select>
+            <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
 
           {/* Location Filter */}
@@ -242,15 +248,20 @@ const TeamDiscovery = () => {
 
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-text-muted uppercase tracking-wider">Choose Desired Role</label>
-              <select
-                value={applyRole}
-                onChange={(e) => setApplyRole(e.target.value)}
-                className="w-full bg-[#16161a] border border-[#232329] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500 transition-all font-medium appearance-none cursor-pointer"
-              >
-                {selectedTeam.openSlots?.map((slot, idx) => (
-                  <option key={idx} value={slot.role}>{slot.role}</option>
-                ))}
-              </select>
+              <div className="relative flex items-center">
+                <select
+                  value={applyRole}
+                  onChange={(e) => setApplyRole(e.target.value)}
+                  className="w-full bg-[#16161a] border border-[#232329] rounded-xl pl-4 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500 transition-all font-medium appearance-none cursor-pointer"
+                >
+                  {selectedTeam.openSlots?.map((slot, idx) => (
+                    <option key={idx} value={slot.role}>{slot.role}</option>
+                  ))}
+                </select>
+                <svg className="w-4 h-4 text-text-muted absolute right-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
 
             <div className="space-y-1.5">
