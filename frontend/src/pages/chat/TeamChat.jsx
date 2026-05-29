@@ -23,11 +23,11 @@ const TeamChat = () => {
       try {
         setLoading(true);
         const [teamRes, msgRes] = await Promise.all([
-          axios.get(`/api/teams/${teamId}`),
-          axios.get(`/api/teams/${teamId}/messages`),
+          axios.get(`/teams/${teamId}`),
+          axios.get(`/message/${teamId}`),
         ]);
-        setTeam(teamRes.data);
-        setMessages(msgRes.data);
+        setTeam(teamRes.data?.team || teamRes.data?.data || teamRes.data);
+        setMessages(msgRes.data?.data || msgRes.data?.messages || msgRes.data || []);
       } catch (err) {
         toast.error("Failed to load lounge data");
         navigate("/dashboard");
@@ -68,11 +68,12 @@ const TeamChat = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const res = await axios.post(`/api/teams/${teamId}/messages`, {
+      const res = await axios.post(`/message/send/${teamId}`, {
         content: newMessage,
       });
       // Emitted message is handled via socket listener as well
-      socket.emit("send_message", { ...res.data, teamId });
+      const sentMsg = res.data?.data || res.data;
+      socket.emit("send_message", { ...sentMsg, teamId });
       setNewMessage("");
     } catch (err) {
       toast.error("Failed to send message");
