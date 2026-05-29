@@ -7,7 +7,9 @@ const useMeetSocket = (onMeetEnded) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    socketRef.current = io("http://localhost:8000", {
+    const socketUrl = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace("/api", "");
+
+    socketRef.current = io(socketUrl, {
       withCredentials: true,
       auth: { token }
     });

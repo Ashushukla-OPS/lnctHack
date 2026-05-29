@@ -162,7 +162,7 @@ const teamSchema = new mongoose.Schema(
   }
 );
 
-teamSchema.pre("save", function (next) {
+teamSchema.pre("save", function () {
   if (this.isModified("members")) {
     this.chemistryScore = null;
     this.chemistryNote = "";
@@ -175,7 +175,6 @@ teamSchema.pre("save", function (next) {
     this.skillGapUpdatedAt = null;
     this.skillGapData = null;
   }
-  next();
 });
 
 const TeamModel = mongoose.model("Team", teamSchema);
