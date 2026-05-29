@@ -20,9 +20,8 @@ const PublicProfile = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        // Assuming backend maps /users/:username to user details + populated score, etc
         const res = await axios.get(`/users/${username}`);
-        setProfile(res.data?.data || res.data);
+        setProfile(res.data?.user || res.data?.data || res.data);
       } catch (err) {
         setError(true);
         toast.error('Profile not found');
